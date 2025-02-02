@@ -1,0 +1,244 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Care_Schedule {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime   @default(now()) @db.Timestamptz(6)
+  start_date    DateTime   @db.Timestamp(6)
+  end_date      DateTime   @db.Timestamp(6)
+  user_plant_id String     @db.Uuid
+  User_Plant    User_Plant @relation(fields: [user_plant_id], references: [id], onDelete: Cascade)
+  Task          Task[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Care_instruction {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  water       Json
+  sunlight    LEVEL    @default(MEDIUM)
+  moisture    LEVEL    @default(MEDIUM)
+  temperature Json
+  fertilizer  Json?
+  pruning     Json?
+  phase_id    String?  @unique @db.Uuid
+  Phase       Phase?   @relation(fields: [phase_id], references: [id], onDelete: Cascade)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Category {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  category_name String   @db.VarChar
+  Plant         Plant[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model District {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  district_name String   @db.VarChar
+  province_id   String   @db.Uuid
+  Province      Province @relation(fields: [province_id], references: [id], onDelete: Cascade)
+  Ward          Ward[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Notification {
+  id         String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime            @default(now()) @db.Timestamptz(6)
+  content    String
+  send_time  DateTime?           @db.Time(6)
+  status     NOTIFICATION_STATUS @default(PENDING)
+  user_id    String?             @db.Uuid
+  User       User?               @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Phase {
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at       DateTime          @default(now()) @db.Timestamptz(6)
+  phase_name       String            @db.VarChar
+  desc             String?
+  duration         BigInt
+  size             Float
+  plant_id         String            @db.Uuid
+  Care_instruction Care_instruction?
+  Plant            Plant             @relation(fields: [plant_id], references: [id], onDelete: Cascade)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Plant {
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at       DateTime         @default(now()) @db.Timestamptz(6)
+  plant_name       String           @db.VarChar
+  scientific_name  String?          @db.VarChar
+  overview         String[]
+  characteristic   String[]
+  function         String[]
+  meaning          String[]
+  image_url        String[]
+  difficulty_level DIFFICULTY_LEVEL @default(MEDIUM)
+  soil_type        SOIL_TYPE
+  category_id      String           @db.Uuid
+  habitatLocation  PLANT_SITE       @default(OUTDOOR)
+  minTemperature   Float            @db.Real
+  maxTemperature   Float            @db.Real
+  minMatureSize    Float            @db.Real
+  maxMatureSize    Float            @db.Real
+  humidityRange    LEVEL            @default(MEDIUM)
+  lightRequirement LEVEL            @default(MEDIUM)
+  Phase            Phase[]
+  Category         Category         @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  User_Plant       User_Plant[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Province {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime   @default(now()) @db.Timestamptz(6)
+  province_name String     @unique @db.VarChar
+  District      District[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Role {
+  id         String   @id(map: "Roles_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  role_name  String?  @unique(map: "Roles_role_name_key") @db.VarChar
+  User       User[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Task {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at        DateTime       @default(now()) @db.Timestamptz(6)
+  content           String         @db.VarChar
+  task_time         DateTime       @db.Time(6)
+  completion_status TASK_STATUS
+  task_date         DateTime       @db.Date
+  care_schedule_id  String?        @db.Uuid
+  Care_Schedule     Care_Schedule? @relation(fields: [care_schedule_id], references: [id], onDelete: Cascade)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model User {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at   DateTime       @default(now()) @db.Timestamptz(6)
+  username     String         @unique(map: "users_username_key") @db.VarChar
+  email        String?        @unique(map: "users_email_key") @db.VarChar
+  phone_number String?        @unique(map: "users_phone_number_key") @db.VarChar
+  role_id      String         @db.Uuid
+  ward_id      String?        @db.Uuid
+  preferences  Json?
+  Notification Notification[]
+  Role         Role           @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  Ward         Ward?          @relation(fields: [ward_id], references: [id], onDelete: Cascade)
+  User_Plant   User_Plant[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model User_Plant {
+  id                 String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at         DateTime        @default(now()) @db.Timestamptz(6)
+  nickname           String?         @db.VarChar
+  favorite           Boolean         @default(false)
+  growth_stage       String          @db.Uuid
+  planting_date      DateTime        @default(now()) @db.Timestamp(6)
+  image_url          String[]
+  plant_site         PLANT_SITE
+  caring_plant_infor Json
+  plant_id           String          @db.Uuid
+  user_id            String          @db.Uuid
+  Care_Schedule      Care_Schedule[]
+  Plant              Plant           @relation(fields: [plant_id], references: [id], onDelete: Cascade)
+  User               User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Ward {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  ward_name   String   @db.VarChar
+  district_id String   @db.Uuid
+  User        User[]
+  District    District @relation(fields: [district_id], references: [id], onDelete: Cascade)
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum DIFFICULTY_LEVEL {
+  EASY
+  MEDIUM
+  HARD
+  VERY_HARD
+  EXTREME
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum LEVEL {
+  NONE
+  VERY_LOW
+  LOW
+  MEDIUM
+  HIGH
+  VERY_HIGH
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum NOTIFICATION_STATUS {
+  PENDING
+  SENT
+  READ
+}
+
+enum PLANT_SITE {
+  INDOOR
+  OUTDOOR
+  BALCONY
+  GARDEN
+  GREENHOUSE
+  WINDOW_SILL
+  KITCHEN
+  BATHROOM
+  TERRACE
+  OFFICE
+  HYDROPONICS
+  WALL_PLANTER
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum SOIL_TYPE {
+  SANDY
+  CLAY
+  SILT
+  PEAT
+  CHALK
+  LOAM
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum TASK_STATUS {
+  DO
+  DONE
+  NOT_YET @map("NOT YET")
+}
