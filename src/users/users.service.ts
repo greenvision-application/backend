@@ -5,8 +5,11 @@ import { PrismaService } from '@/prisma/prisma.service';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return this.prisma.user.findMany({ where: { is_active: true } });
+  async findAll() {
+    return this.prisma.user.findMany({
+      where: { is_active: true },
+      orderBy: { created_at: 'desc' },
+    });
   }
 
   remove(id: string) {

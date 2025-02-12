@@ -1,5 +1,12 @@
-import { Controller, Get, Param, Delete } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Param,
+  Delete,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
+import { ApiOkResponse, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity/user.entity';
 import { UsersService } from './users.service';
 
@@ -9,9 +16,18 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @ApiOkResponse({ type: UserEntity, isArray: true })
-  findAll() {
-    return this.usersService.findAll();
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiOkResponse({
+    description: 'List of all users retrieved successfully',
+    type: UserEntity,
+    isArray: true,
+  })
+  async findAll() {
+    try {
+      return await this.usersService.findAll();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Delete(':id')
