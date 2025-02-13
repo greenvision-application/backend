@@ -59,7 +59,23 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  @ApiOperation({ summary: 'Delete user by id' })
+  @ApiOkResponse({
+    description: 'User deleted successfully',
+    type: UserEntity,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    try {
+      return await this.usersService.remove(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
