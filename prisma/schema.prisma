@@ -149,6 +149,7 @@ model User {
   role_id      String         @db.Uuid
   ward_id      String?        @db.Uuid
   preferences  Json?
+  is_active    Boolean        @default(true)
   Notification Notification[]
   Role         Role           @relation(fields: [role_id], references: [id], onDelete: Cascade)
   Ward         Ward?          @relation(fields: [ward_id], references: [id], onDelete: Cascade)
