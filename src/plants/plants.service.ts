@@ -62,7 +62,23 @@ export class PlantsService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} plant`;
+  async remove(id: string) {
+    try {
+      const plant = await this.prisma.plant.findUnique({
+        where: { id },
+      });
+
+      if (!plant) {
+        throw new Error(`Plant with id ${id} not found`);
+      }
+
+      await this.prisma.plant.delete({
+        where: { id },
+      });
+
+      return { message: `Plant with id ${id} has been deleted` };
+    } catch (error) {
+      throw new Error(`Failed to delete plant with id ${id}: ${error.message}`);
+    }
   }
 }
