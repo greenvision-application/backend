@@ -10,10 +10,19 @@ export class PlantsService {
     return this.prisma.plant.create({ data: plantData });
   }
 
-  findAll() {
-    return `This action returns all plants`;
+  async findAll() {
+    try {
+      const plants = await this.prisma.plant.findMany({
+        orderBy: { created_at: 'desc' },
+      });
+      if (!plants || plants.length === 0) {
+        throw new Error('No plants found');
+      }
+      return plants;
+    } catch (error) {
+      throw new Error(`Failed to fetch plants: ${error.message}`);
+    }
   }
-
   findOne(id: number) {
     return `This action returns a #${id} plant`;
   }

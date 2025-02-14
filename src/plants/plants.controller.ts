@@ -33,8 +33,17 @@ export class PlantsController {
   }
 
   @Get()
-  findAll() {
-    return this.plantsService.findAll();
+  @ApiOperation({ summary: 'Get all plants' })
+  @ApiOkResponse({
+    description: 'List of all plants',
+    type: [PlantEntity],
+  })
+  async findAll() {
+    try {
+      return await this.plantsService.findAll();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get(':id')
