@@ -23,8 +23,21 @@ export class PlantsService {
       throw new Error(`Failed to fetch plants: ${error.message}`);
     }
   }
-  findOne(id: number) {
-    return `This action returns a #${id} plant`;
+
+  async findOne(id: string) {
+    try {
+      const plant = await this.prisma.plant.findUnique({
+        where: { id },
+      });
+
+      if (!plant) {
+        throw new Error(`Plant with id ${id} not found`);
+      }
+
+      return plant;
+    } catch (error) {
+      throw new Error(`Failed to fetch plant with id ${id}: ${error.message}`);
+    }
   }
 
   async update(id: string, updatePlantDto: UpdatePlantDto) {
