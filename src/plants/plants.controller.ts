@@ -47,8 +47,28 @@ export class PlantsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.plantsService.findOne(+id);
+  @ApiOperation({ summary: 'Get plant by id' })
+  @ApiOkResponse({
+    description: 'Plant details',
+    type: PlantEntity,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Plant not found',
+  })
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    try {
+      const plant = await this.plantsService.findOne(id);
+      if (!plant) {
+        throw new NotFoundException('Plant not found');
+      }
+      return plant;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Patch(':id')
