@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
@@ -69,7 +69,7 @@ export class PlantsService {
       });
 
       if (!plant) {
-        throw new Error(`Plant with id ${id} not found`);
+        throw new NotFoundException(`Plant with id ${id} not found`);
       }
 
       await this.prisma.plant.delete({
@@ -78,6 +78,9 @@ export class PlantsService {
 
       return { message: `Plant with id ${id} has been deleted` };
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`Failed to delete plant with id ${id}: ${error.message}`);
     }
   }
