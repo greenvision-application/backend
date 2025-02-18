@@ -96,7 +96,22 @@ export class PlantsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.plantsService.remove(+id);
+  @ApiOperation({ summary: 'Delete plant by id' })
+  @ApiOkResponse({
+    description: 'Plant deleted successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Plant not found',
+  })
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
+    try {
+      return await this.plantsService.remove(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
