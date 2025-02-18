@@ -47,7 +47,7 @@ export class PlantsService {
       });
 
       if (!plant) {
-        throw new Error(`Plant with id ${id} not found`);
+        throw new NotFoundException(`Plant with id ${id} not found`);
       }
 
       const updatedPlant = await this.prisma.plant.update({
@@ -58,6 +58,9 @@ export class PlantsService {
       });
       return updatedPlant;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`Failed to update plant with id ${id}: ${error.message}`);
     }
   }
