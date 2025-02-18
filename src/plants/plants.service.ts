@@ -16,10 +16,13 @@ export class PlantsService {
         orderBy: { created_at: 'desc' },
       });
       if (!plants || plants.length === 0) {
-        throw new Error('No plants found');
+        throw new NotFoundException('No plants found');
       }
       return plants;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`Failed to fetch plants: ${error.message}`);
     }
   }
@@ -31,11 +34,14 @@ export class PlantsService {
       });
 
       if (!plant) {
-        throw new Error(`Plant with id ${id} not found`);
+        throw new NotFoundException(`Plant with id ${id} not found`);
       }
 
       return plant;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`Failed to fetch plant with id ${id}: ${error.message}`);
     }
   }
