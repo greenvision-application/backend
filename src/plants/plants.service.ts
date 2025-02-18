@@ -53,7 +53,7 @@ export class PlantsService {
       });
 
       if (!plant) {
-        throw new Error(`Plant with id ${id} not found`);
+        throw new NotFoundException(`Plant with id ${id} not found`);
       }
 
       const updatedPlant = await this.prisma.plant.update({
@@ -64,11 +64,33 @@ export class PlantsService {
       });
       return updatedPlant;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`Failed to update plant with id ${id}: ${error.message}`);
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} plant`;
+  async remove(id: string) {
+    try {
+      const plant = await this.prisma.plant.findUnique({
+        where: { id },
+      });
+
+      if (!plant) {
+        throw new NotFoundException(`Plant with id ${id} not found`);
+      }
+
+      await this.prisma.plant.delete({
+        where: { id },
+      });
+
+      return { message: `Plant with id ${id} has been deleted` };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(`Failed to delete plant with id ${id}: ${error.message}`);
+    }
   }
 }
