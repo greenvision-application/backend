@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
@@ -16,10 +16,13 @@ export class PlantsService {
         orderBy: { created_at: 'desc' },
       });
       if (!plants || plants.length === 0) {
-        throw new Error('No plants found');
+        throw new NotFoundException('No plants found');
       }
       return plants;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`Failed to fetch plants: ${error.message}`);
     }
   }
@@ -31,11 +34,14 @@ export class PlantsService {
       });
 
       if (!plant) {
-        throw new Error(`Plant with id ${id} not found`);
+        throw new NotFoundException(`Plant with id ${id} not found`);
       }
 
       return plant;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`Failed to fetch plant with id ${id}: ${error.message}`);
     }
   }
@@ -47,7 +53,7 @@ export class PlantsService {
       });
 
       if (!plant) {
-        throw new Error(`Plant with id ${id} not found`);
+        throw new NotFoundException(`Plant with id ${id} not found`);
       }
 
       const updatedPlant = await this.prisma.plant.update({
@@ -58,11 +64,33 @@ export class PlantsService {
       });
       return updatedPlant;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`Failed to update plant with id ${id}: ${error.message}`);
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} plant`;
+  async remove(id: string) {
+    try {
+      const plant = await this.prisma.plant.findUnique({
+        where: { id },
+      });
+
+      if (!plant) {
+        throw new NotFoundException(`Plant with id ${id} not found`);
+      }
+
+      await this.prisma.plant.delete({
+        where: { id },
+      });
+
+      return { message: `Plant with id ${id} has been deleted` };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(`Failed to delete plant with id ${id}: ${error.message}`);
+    }
   }
 }
