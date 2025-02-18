@@ -9,6 +9,8 @@ import {
   HttpStatus,
   ParseUUIDPipe,
   NotFoundException,
+  BadRequestException,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -20,6 +22,7 @@ import {
 import { UserEntity } from './entities/user.entity/user.entity';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -95,5 +98,36 @@ export class UsersController {
   })
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update user by id' })
+  @ApiOkResponse({
+    description: 'User updated successfully',
+    type: UserEntity,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Username, email hoặc phone_number đã tồn tại',
+  })
+  async update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    try {
+      return await this.usersService.updateUser(id, updateUserDto);
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
