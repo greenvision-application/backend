@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '@prisma/client';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -25,12 +26,12 @@ export class UsersService {
       is_active,
     } = createUserDto;
 
-    // Kiểm tra xem username đã tồn tại chưa
+    // Kiểm tra username đã tồn tại
     const existingUserByUsername = await this.prisma.user.findUnique({
       where: { username },
     });
     if (existingUserByUsername) {
-      throw new Error('Username đã tồn tại');
+      throw new BadRequestException('Username đã tồn tại');
     }
 
     // Kiểm tra email đã tồn tại nếu có email
@@ -39,7 +40,7 @@ export class UsersService {
         where: { email },
       });
       if (existingUserByEmail) {
-        throw new Error('Email đã tồn tại');
+        throw new BadRequestException('Email đã tồn tại');
       }
     }
 
@@ -49,17 +50,17 @@ export class UsersService {
         where: { phone_number },
       });
       if (existingUserByPhone) {
-        throw new Error('Số điện thoại đã tồn tại');
+        throw new BadRequestException('Số điện thoại đã tồn tại');
       }
     }
 
     // Nếu không có cả email và phone_number thì báo lỗi
     if (!email && !phone_number) {
-      throw new Error('bạn chưa điền email hoặc số điện thoại');
+      throw new BadRequestException('Bạn chưa điền email hoặc số điện thoại');
     }
 
     if (!role_id) {
-      throw new Error('Bạn chưa chọn role id');
+      throw new BadRequestException('Bạn chưa chọn role id');
     }
 
     return this.prisma.user.create({

@@ -88,11 +88,12 @@ export class UsersController {
     description: 'The user has been successfully created.',
     type: UserEntity,
   })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Username, email or phone number already exists, or email/phone number is required',
+  })
   async create(@Body() createUserDto: CreateUserDto) {
-    try {
-      return await this.usersService.createUser(createUserDto);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return this.usersService.createUser(createUserDto);
   }
 }

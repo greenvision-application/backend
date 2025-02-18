@@ -5,6 +5,7 @@ import {
   IsString,
   IsOptional,
   IsPhoneNumber,
+  Matches,
 } from 'class-validator';
 import { Transform, TransformFnParams } from 'class-transformer';
 import { Prisma } from '@prisma/client';
@@ -16,6 +17,9 @@ export class CreateUserDto
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
+  @Matches(/^[A-Za-z]+$/, {
+    message: 'Username chỉ được chứa chữ cái (không có số hoặc ký tự đặc biệt)',
+  })
   username: string;
 
   @ApiProperty({ required: false, default: null })
