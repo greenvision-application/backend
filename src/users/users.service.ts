@@ -58,6 +58,10 @@ export class UsersService {
       throw new Error('bạn chưa điền email hoặc số điện thoại');
     }
 
+    if (!role_id) {
+      throw new Error('Bạn chưa chọn role id');
+    }
+
     return this.prisma.user.create({
       data: {
         username,
