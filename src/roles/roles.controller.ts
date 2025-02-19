@@ -84,7 +84,7 @@ export class RolesController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a role' })
   @ApiOkResponse({
-    description: 'Task updated successfully',
+    description: 'Role updated successfully',
     type: RoleEntity,
   })
   @ApiResponse({
