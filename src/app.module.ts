@@ -6,7 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { TasksModule } from './tasks/tasks.module';
 import { PlantsModule } from './plants/plants.module';
-
+import { RolesModule } from './roles/roles.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
@@ -14,6 +14,7 @@ import { PlantsModule } from './plants/plants.module';
     UsersModule,
     TasksModule,
     PlantsModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
