@@ -14,6 +14,16 @@ export class RolesService {
 
   async create(createRoleDto: CreateRoleDto) {
     try {
+      // Kiểm tra xem role có tồn tại chưa
+      const existingRole = await this.prisma.role.findUnique({
+        where: { role_name: createRoleDto.role_name },
+      });
+
+      if (existingRole) {
+        throw new BadRequestException(
+          `Role with name "${createRoleDto.role_name}" already exists.`,
+        );
+      }
       const role = await this.prisma.role.create({
         data: createRoleDto,
       });
