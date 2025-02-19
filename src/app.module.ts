@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { TasksModule } from './tasks/tasks.module';
 import { PlantsModule } from './plants/plants.module';
 import { RolesModule } from './roles/roles.module';
+import { CategoriesModule } from './categories/categories.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
@@ -15,6 +16,7 @@ import { RolesModule } from './roles/roles.module';
     TasksModule,
     PlantsModule,
     RolesModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
