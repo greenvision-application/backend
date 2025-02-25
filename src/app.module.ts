@@ -9,6 +9,7 @@ import { PlantsModule } from './plants/plants.module';
 import { RolesModule } from './roles/roles.module';
 import { CategoriesModule } from './categories/categories.module';
 import { GeminiModule } from './gemini/gemini.module';
+import { FileUploadModule } from './file-upload/file-upload.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
@@ -19,6 +20,7 @@ import { GeminiModule } from './gemini/gemini.module';
     RolesModule,
     CategoriesModule,
     GeminiModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

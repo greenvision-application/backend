@@ -67,62 +67,45 @@ export class GeminiService {
       }
       const imageBuffer = await imageResp.arrayBuffer();
 
+      const contentType = imageResp.headers.get('content-type');
+
+      if (!gemini.validMimeTypes.includes(contentType)) {
+        throw new Error(
+          'Unsupported image format. Please use PNG, JPEG, WebP, HEIC or HEIF format',
+        );
+      }
+
       const result = await this.model.generateContent([
         {
           inlineData: {
             data: Buffer.from(imageBuffer).toString('base64'),
-            mimeType: 'image/jpeg',
+            mimeType: contentType,
           },
         },
         data.prompt,
       ]);
 
       return {
-        result: await result.response.text(),
+        result: result.response.text(),
       };
     } catch (error) {
       this.logger.error('Error analyzing image:', error);
     }
   }
-
-  async uploadImage(file: Express.Multer.File) {
-    console.log(file);
-    console.log(file.path);
-
-    try {
-      const uploadResult = await this.fileManager.uploadFile(file.path, {
-        mimeType: file.mimetype,
-        displayName: file.originalname,
-      });
-
-      this.logger.log(
-        `Uploaded file ${uploadResult.file.displayName} as: ${uploadResult.file.uri}`,
-      );
-
-      return {
-        fileUri: uploadResult.file.uri,
-        mimeType: uploadResult.file.mimeType,
-      };
-    } catch (error) {
-      this.logger.error('Error uploading image:', error);
-      throw new Error('Failed to upload image');
-    }
-  }
-
-  async analyzeUploadedFile(fileUri: string) {
+  async analyzeUploadedFile(fileUri: string, mimeType: string) {
     try {
       const result = await this.model.generateContent([
-        'Tell me about this image.',
+        'Miêu tả ảnh này bằng tiếng việt cho tôi.',
         {
           fileData: {
             fileUri,
-            mimeType: 'image/jpeg',
+            mimeType: mimeType,
           },
         },
       ]);
 
       return {
-        result: await result.response.text(),
+        result: result.response.text(),
       };
     } catch (error) {
       this.logger.error('Error analyzing uploaded image:', error);

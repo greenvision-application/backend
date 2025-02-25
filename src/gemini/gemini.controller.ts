@@ -15,11 +15,15 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUploadService } from '@/file-upload/file-upload.service';
 
 @ApiTags('Gemini')
 @Controller('gemini')
 export class GeminiController {
-  constructor(private readonly geminiService: GeminiService) {}
+  constructor(
+    private readonly geminiService: GeminiService,
+    private readonly uploadFileService: FileUploadService,
+  ) {}
 
   @ApiOperation({ summary: 'Generate AI response from prompt' })
   @ApiResponse({ status: 200, description: 'Return AI generated text' })
@@ -55,7 +59,11 @@ export class GeminiController {
   @Post('upload-image')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    const uploadResult = await this.geminiService.uploadImage(file);
-    return this.geminiService.analyzeUploadedFile(uploadResult.fileUri);
+    const uploadResult = await this.uploadFileService.handleFileUpload(file);
+    console.log('File url: ', uploadResult.fileUri);
+    return this.geminiService.analyzeUploadedFile(
+      uploadResult.fileUri,
+      uploadResult.mimeType,
+    );
   }
 }

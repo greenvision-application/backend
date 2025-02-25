@@ -1,14 +1,10 @@
 import { Module } from '@nestjs/common';
-import { GeminiService } from './gemini.service';
-import { GeminiController } from './gemini.controller';
-import { FileUploadModule } from '@/file-upload/file-upload.module';
-import { FileUploadService } from '@/file-upload/file-upload.service';
+import { FileUploadService } from './file-upload.service';
+import { FileUploadController } from './file-upload.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-
 @Module({
   imports: [
-    FileUploadModule,
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads',
@@ -19,7 +15,8 @@ import { diskStorage } from 'multer';
       }),
     }),
   ],
-  controllers: [GeminiController],
-  providers: [GeminiService, FileUploadService],
+  controllers: [FileUploadController],
+  providers: [FileUploadService],
+  exports: [FileUploadService],
 })
-export class GeminiModule {}
+export class FileUploadModule {}
