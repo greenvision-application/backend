@@ -27,7 +27,7 @@ export class FileUploadController {
       },
     },
   })
-  @Post('upload')
+  @Post('supabase')
   @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
     return this.fileUploadService.handleFileUploadToSupabase(file);

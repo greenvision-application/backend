@@ -56,7 +56,7 @@ export class GeminiService {
     return match ? `https://images.unsplash.com/${match[0]}?w=400` : url;
   };
 
-  private async getUnsplashImage(query: string): Promise<string[]> {
+  private async getUnsplashImage(query: string): Promise<string[] | null> {
     try {
       const response = await this.unsplash.search.getPhotos({
         query,
@@ -65,7 +65,8 @@ export class GeminiService {
       });
 
       if (!response.response || !response.response.results.length) {
-        throw new Error(`No images found for query: ${query}`);
+        this.logger.log(`No images found for query: ${query}`);
+        return null;
       }
 
       const result = response.response.results.map((image) =>
@@ -75,7 +76,7 @@ export class GeminiService {
       return result;
     } catch (error) {
       this.logger.error(`Failed to fetch Unsplash images for ${query}:`, error);
-      throw new Error('Unable to retrieve images from Unsplash.');
+      return null;
     }
   }
 
@@ -134,9 +135,9 @@ export class GeminiService {
 
       const processedResult = await this.processAIResponse(result);
 
-      const { scientific_name, plant_name } = processedResult;
-      const searchQuery = scientific_name || plant_name;
-      const unsplashImages = await this.getUnsplashImage(searchQuery);
+      const { scientific_name, plant_name, searchQuery } = processedResult;
+      const searchQueryKey = searchQuery || scientific_name || plant_name;
+      const unsplashImages = await this.getUnsplashImage(searchQueryKey);
 
       return { ...processedResult, image_url: unsplashImages };
     } catch (error) {
@@ -161,9 +162,9 @@ export class GeminiService {
 
       const processedResult = await this.processAIResponse(result);
 
-      const { scientific_name, plant_name } = processedResult;
-      const searchQuery = scientific_name || plant_name;
-      const unsplashImages = await this.getUnsplashImage(searchQuery);
+      const { scientific_name, plant_name, searchQuery } = processedResult;
+      const searchQueryKey = searchQuery || scientific_name || plant_name;
+      const unsplashImages = await this.getUnsplashImage(searchQueryKey);
 
       return { ...processedResult, image_url: unsplashImages };
     } catch (error) {

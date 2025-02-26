@@ -82,4 +82,10 @@ export class PlantResponseDTO {
     required: false,
   })
   image_url?: string[];
+
+  @ApiProperty({
+    description: 'Search query used to find the plant on Unsplash.',
+    required: false,
+  })
+  searchQuery?: string;
 }

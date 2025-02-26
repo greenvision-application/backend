@@ -15,6 +15,11 @@ const scanImagePlantSchema: ObjectSchema = {
       description: 'Scientific name of the plant.',
       nullable: true,
     },
+    searchQuery: {
+      type: SchemaType.STRING,
+      description: 'Search query for finding plant images on Unsplash.',
+      nullable: true,
+    },
     overview: {
       type: SchemaType.ARRAY,
       description: 'General description or summary about the plant.',
@@ -95,6 +100,7 @@ const scanImagePlantSchema: ObjectSchema = {
     'function',
     'meaning',
     'soil_type',
+    'searchQuery',
     'difficulty_level',
     'lightRequirement',
     'humidityRange',
