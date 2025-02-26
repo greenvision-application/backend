@@ -6,8 +6,9 @@ import {
 } from '@google/generative-ai';
 import { GoogleAIFileManager } from '@google/generative-ai/server';
 import { ConfigService } from '@nestjs/config';
-import gemini from 'constants/gemini';
 import { v4 } from 'uuid';
+import gemini from 'constants/gemini';
+import keys from 'constants/keys';
 import { GetAIMessageDTO } from './dto/get-ai-response.dto';
 
 @Injectable()
@@ -19,7 +20,7 @@ export class GeminiService {
   private readonly logger = new Logger(GeminiService.name);
 
   constructor(configService: ConfigService) {
-    const geminiApiKey = configService.get('GEMINI_API_KEY');
+    const geminiApiKey = configService.get(keys.geminiKey);
     this.googleAI = new GoogleGenerativeAI(geminiApiKey);
     this.fileManager = new GoogleAIFileManager(geminiApiKey);
     this.model = this.googleAI.getGenerativeModel({

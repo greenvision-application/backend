@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import * as fs from 'fs';
 import gemini from 'constants/gemini';
+import keys from 'constants/keys';
 
 @Injectable()
 export class FileUploadService {
@@ -13,11 +14,11 @@ export class FileUploadService {
   private readonly bucketName: string;
 
   constructor(configService: ConfigService) {
-    const geminiApiKey = configService.get('GEMINI_API_KEY');
+    const geminiApiKey = configService.get(keys.geminiKey);
     this.fileManager = new GoogleAIFileManager(geminiApiKey);
-    const supabaseUrl = configService.get('SUPABASE_URL');
-    const supabaseKey = configService.get('SUPABASE_ANON_KEY');
-    this.bucketName = configService.get('SUPABASE_STORAGE_BUCKET');
+    const supabaseUrl = configService.get(keys.supabaseUrl);
+    const supabaseKey = configService.get(keys.supabaseAnonKey);
+    this.bucketName = configService.get(keys.storageBucket);
 
     if (!supabaseUrl || !supabaseKey) {
       throw new BadRequestException('Supabase credentials are missing');
