@@ -59,7 +59,8 @@ export class GeminiController {
   @Post('upload-image')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    const uploadResult = await this.uploadFileService.handleFileUpload(file);
+    const uploadResult =
+      await this.uploadFileService.handleFileUploadToGoogle(file);
     console.log('File url: ', uploadResult.fileUri);
     return this.geminiService.analyzeUploadedFile(
       uploadResult.fileUri,
