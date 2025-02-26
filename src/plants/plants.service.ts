@@ -2,10 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
+import { GeminiService } from '@/gemini/gemini.service';
 
 @Injectable()
 export class PlantsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly geminiService: GeminiService,
+  ) {}
   create(plantData: CreatePlantDto) {
     return this.prisma.plant.create({ data: plantData });
   }
@@ -91,6 +95,38 @@ export class PlantsService {
         throw error;
       }
       throw new Error(`Failed to delete plant with id ${id}: ${error.message}`);
+    }
+  }
+
+  async scanPlant(plantImageUrl: string) {
+    try {
+      const identifyPlant = await this.geminiService.analyzeImageUrl({
+        imageUrl: plantImageUrl,
+        sessionId: null,
+      });
+      const { scientific_name, plant_name } = identifyPlant;
+
+      const existingPlant = await this.prisma.plant.findFirst({
+        where: {
+          OR: [{ scientific_name }, { plant_name }],
+        },
+      });
+      if (existingPlant) {
+        return existingPlant;
+      }
+
+      return identifyPlant;
+
+      // If plant doesn't exist, create new plant record
+      // const newPlant = await this.prisma.plant.create({
+      //   data: {
+      //     scientific_name,
+      //     plant_name,
+      //   },
+      // });
+      // return newPlant;
+    } catch (error) {
+      throw new Error(`Failed to scan plant: ${error.message}`);
     }
   }
 }

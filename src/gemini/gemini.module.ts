@@ -21,5 +21,6 @@ import { diskStorage } from 'multer';
   ],
   controllers: [GeminiController],
   providers: [GeminiService, FileUploadService],
+  exports: [GeminiService],
 })
 export class GeminiModule {}

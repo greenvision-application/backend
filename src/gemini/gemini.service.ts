@@ -13,6 +13,7 @@ import { GetAIScanResultDTO } from './dto/get-scan-result.dto';
 import gemini from 'constants/gemini';
 import keys from 'constants/keys';
 import systemPrompt from 'constants/prompts/to-scan';
+import { PlantResponseDTO } from './dto/ai-scan-plant-response.dto';
 
 @Injectable()
 export class GeminiService {
@@ -60,15 +61,17 @@ export class GeminiService {
     }
   }
 
-  private async processAIResponse(result: GenerateContentResult) {
+  private async processAIResponse(
+    result: GenerateContentResult,
+  ): Promise<PlantResponseDTO> {
     const rawText = result.response?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!rawText) {
       throw new Error('No valid response from Gemini AI model');
     }
-    return { result: JSON.parse(rawText) };
+    return JSON.parse(rawText);
   }
 
-  async analyzeImageUrl(data: GetAIScanResultDTO) {
+  async analyzeImageUrl(data: GetAIScanResultDTO): Promise<PlantResponseDTO> {
     try {
       if (!data.imageUrl) {
         throw new Error('Image URL is required');
@@ -103,7 +106,10 @@ export class GeminiService {
     }
   }
 
-  async analyzeUploadedFile(fileUri: string, mimeType: string) {
+  async analyzeUploadedFile(
+    fileUri: string,
+    mimeType: string,
+  ): Promise<PlantResponseDTO> {
     try {
       const result = await this.model.generateContent([
         {
