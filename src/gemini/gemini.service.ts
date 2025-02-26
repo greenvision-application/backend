@@ -8,6 +8,7 @@ import {
 import { GoogleAIFileManager } from '@google/generative-ai/server';
 import { ConfigService } from '@nestjs/config';
 import { v4 } from 'uuid';
+import { createApi } from 'unsplash-js';
 import { GetAIMessageDTO } from './dto/get-ai-response.dto';
 import { GetAIScanResultDTO } from './dto/get-scan-result.dto';
 import gemini from 'constants/gemini';
@@ -22,15 +23,18 @@ export class GeminiService {
   private readonly fileManager: GoogleAIFileManager;
   private chatSessions: { [sessionId: string]: ChatSession } = {};
   private readonly logger = new Logger(GeminiService.name);
+  private readonly unsplash;
 
   constructor(configService: ConfigService) {
     const geminiApiKey = configService.get(keys.geminiKey);
+    const unsplashAccessKey = configService.get(keys.unsplashAccessKey);
     this.googleAI = new GoogleGenerativeAI(geminiApiKey);
     this.fileManager = new GoogleAIFileManager(geminiApiKey);
     this.model = this.googleAI.getGenerativeModel({
       model: gemini.GEMINI_MODEL_NAME,
       generationConfig: gemini.generationConfig,
     });
+    this.unsplash = createApi({ accessKey: unsplashAccessKey });
   }
 
   private getChatSession(sessionId?: string) {
@@ -45,6 +49,34 @@ export class GeminiService {
       sessionId: sessionIdToUse,
       chat: result,
     };
+  }
+
+  private simplifyUrl = (url: string): string => {
+    const match = url.match(/photo-[\w\d-]+/);
+    return match ? `https://images.unsplash.com/${match[0]}?w=400` : url;
+  };
+
+  private async getUnsplashImage(query: string): Promise<string[]> {
+    try {
+      const response = await this.unsplash.search.getPhotos({
+        query,
+        perPage: 5,
+        orientation: 'portrait',
+      });
+
+      if (!response.response || !response.response.results.length) {
+        throw new Error(`No images found for query: ${query}`);
+      }
+
+      const result = response.response.results.map((image) =>
+        this.simplifyUrl(image.urls.small),
+      );
+
+      return result;
+    } catch (error) {
+      this.logger.error(`Failed to fetch Unsplash images for ${query}:`, error);
+      throw new Error('Unable to retrieve images from Unsplash.');
+    }
   }
 
   async generateText(data: GetAIMessageDTO) {
@@ -100,7 +132,13 @@ export class GeminiService {
         systemPrompt.promptToScanEn,
       ]);
 
-      return await this.processAIResponse(result);
+      const processedResult = await this.processAIResponse(result);
+
+      const { scientific_name, plant_name } = processedResult;
+      const searchQuery = scientific_name || plant_name;
+      const unsplashImages = await this.getUnsplashImage(searchQuery);
+
+      return { ...processedResult, image_url: unsplashImages };
     } catch (error) {
       this.logger.error('Error analyzing image:', error);
     }
@@ -121,7 +159,13 @@ export class GeminiService {
         systemPrompt.promptToScanEn,
       ]);
 
-      return await this.processAIResponse(result);
+      const processedResult = await this.processAIResponse(result);
+
+      const { scientific_name, plant_name } = processedResult;
+      const searchQuery = scientific_name || plant_name;
+      const unsplashImages = await this.getUnsplashImage(searchQuery);
+
+      return { ...processedResult, image_url: unsplashImages };
     } catch (error) {
       this.logger.error('Error analyzing uploaded image:', error);
       throw new Error('Failed to analyze image');

@@ -75,4 +75,11 @@ export class PlantResponseDTO {
     required: false,
   })
   maxMatureSize?: number;
+
+  @ApiProperty({
+    description: 'URLs of plant images.',
+    type: [String],
+    required: false,
+  })
+  image_url?: string[];
 }
