@@ -3,13 +3,16 @@ import {
   GoogleGenerativeAI,
   GenerativeModel,
   ChatSession,
+  GenerateContentResult,
 } from '@google/generative-ai';
 import { GoogleAIFileManager } from '@google/generative-ai/server';
 import { ConfigService } from '@nestjs/config';
 import { v4 } from 'uuid';
+import { GetAIMessageDTO } from './dto/get-ai-response.dto';
+import { GetAIScanResultDTO } from './dto/get-scan-result.dto';
 import gemini from 'constants/gemini';
 import keys from 'constants/keys';
-import { GetAIMessageDTO } from './dto/get-ai-response.dto';
+import systemPrompt from 'constants/prompts/to-scan';
 
 @Injectable()
 export class GeminiService {
@@ -25,6 +28,7 @@ export class GeminiService {
     this.fileManager = new GoogleAIFileManager(geminiApiKey);
     this.model = this.googleAI.getGenerativeModel({
       model: gemini.GEMINI_MODEL_NAME,
+      generationConfig: gemini.generationConfig,
     });
   }
 
@@ -56,7 +60,15 @@ export class GeminiService {
     }
   }
 
-  async analyzeImageUrl(data: GetAIMessageDTO) {
+  private async processAIResponse(result: GenerateContentResult) {
+    const rawText = result.response?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) {
+      throw new Error('No valid response from Gemini AI model');
+    }
+    return { result: JSON.parse(rawText) };
+  }
+
+  async analyzeImageUrl(data: GetAIScanResultDTO) {
     try {
       if (!data.imageUrl) {
         throw new Error('Image URL is required');
@@ -67,7 +79,6 @@ export class GeminiService {
         throw new Error('Failed to fetch image');
       }
       const imageBuffer = await imageResp.arrayBuffer();
-
       const contentType = imageResp.headers.get('content-type');
 
       if (!gemini.validMimeTypes.includes(contentType)) {
@@ -83,31 +94,28 @@ export class GeminiService {
             mimeType: contentType,
           },
         },
-        data.prompt,
+        systemPrompt.promptToScanEn,
       ]);
 
-      return {
-        result: result.response.text(),
-      };
+      return await this.processAIResponse(result);
     } catch (error) {
       this.logger.error('Error analyzing image:', error);
     }
   }
+
   async analyzeUploadedFile(fileUri: string, mimeType: string) {
     try {
       const result = await this.model.generateContent([
-        'Miêu tả ảnh này bằng tiếng việt cho tôi.',
         {
           fileData: {
             fileUri,
             mimeType: mimeType,
           },
         },
+        systemPrompt.promptToScanEn,
       ]);
 
-      return {
-        result: result.response.text(),
-      };
+      return await this.processAIResponse(result);
     } catch (error) {
       this.logger.error('Error analyzing uploaded image:', error);
       throw new Error('Failed to analyze image');

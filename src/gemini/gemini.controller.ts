@@ -5,8 +5,6 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { GeminiService } from './gemini.service';
-import { GetAIMessageDTO } from './dto/get-ai-response.dto';
 import {
   ApiOperation,
   ApiResponse,
@@ -15,7 +13,10 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { GeminiService } from './gemini.service';
 import { FileUploadService } from '@/file-upload/file-upload.service';
+import { GetAIMessageDTO } from './dto/get-ai-response.dto';
+import { GetAIScanResultDTO } from './dto/get-scan-result.dto';
 
 @ApiTags('Gemini')
 @Controller('gemini')
@@ -35,7 +36,7 @@ export class GeminiController {
   @ApiOperation({ summary: 'Analyze an image and generate a caption' })
   @ApiResponse({ status: 200, description: 'Return AI generated caption' })
   @Post('image')
-  analyzeImage(@Body() data: GetAIMessageDTO) {
+  analyzeImage(@Body() data: GetAIScanResultDTO) {
     return this.geminiService.analyzeImageUrl(data);
   }
 
