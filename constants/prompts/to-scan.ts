@@ -14,6 +14,7 @@ Công việc của bạn là phân tích hình ảnh, xác định loài cây tr
 - "maxTemperature": Nhiệt độ tối đa mà cây có thể chịu được (°C).
 - "minMatureSize": Kích thước tối thiểu của cây khi trưởng thành (cm).
 - "maxMatureSize": Kích thước tối đa của cây khi trưởng thành (cm).
+- "habitatLocation": Địa điểm cây có thể sống tốt (INDOOR, OUTDOOR, BALCONY, GARDEN, GREENHOUSE, WINDOW_SILL, KITCHEN, BATHROOM, TERRACE, OFFICE, HYDROPONICS, WALL_PLANTER).
 - "searchQuery": Chuỗi tìm kiếm bằng tiếng Anh để tìm các hình ảnh liên quan đến loài cây này.
 Dữ liệu đầu ra phải đảm bảo đúng định dạng JSON theo schema đã định nghĩa. Nếu không tìm thấy thông tin của một trường nào đó, hãy để trống mảng hoặc giá trị null thay vì trả về thông tin không chính xác.
 Lưu ý: Kết quả trả về phải bằng tiếng Việt, ngoại trừ trường "scientific_name" giữ nguyên bằng tiếng Latin.
@@ -35,6 +36,7 @@ Your job is to analyze the image, identify the plant species in the image, and r
 - "maxTemperature": Maximum temperature (°C) the plant can tolerate.
 - "minMatureSize": Minimum mature size of the plant (cm).
 - "maxMatureSize": Maximum mature size of the plant (cm).
+- "habitatLocation": Suitable habitat locations (INDOOR, OUTDOOR, BALCONY, GARDEN, GREENHOUSE, WINDOW_SILL, KITCHEN, BATHROOM, TERRACE, OFFICE, HYDROPONICS, WALL_PLANTER).
 - "searchQuery": English search query string to find related images of this plant species.
 The output data must ensure correct JSON format according to the defined schema. If information for a field is not found, leave an empty array or null value instead of returning inaccurate information.
 Note: The results must be returned in Vietnamese, except for the scientific_name field which should remain in Latin.

@@ -92,6 +92,12 @@ const scanImagePlantSchema: ObjectSchema = {
       description: 'Maximum mature size (cm) of the plant.',
       nullable: true,
     },
+    habitatLocation: {
+      type: SchemaType.STRING,
+      description:
+        'Ideal habitat location for the plant (INDOOR, OUTDOOR, BALCONY, GARDEN, GREENHOUSE, WINDOW_SILL, KITCHEN, BATHROOM, TERRACE, OFFICE, HYDROPONICS, WALL_PLANTER).',
+      nullable: true,
+    },
   },
   required: [
     'plant_name',
@@ -108,6 +114,7 @@ const scanImagePlantSchema: ObjectSchema = {
     'maxTemperature',
     'minMatureSize',
     'maxMatureSize',
+    'habitatLocation',
   ],
 };
 

@@ -88,4 +88,10 @@ export class PlantResponseDTO {
     required: false,
   })
   searchQuery?: string;
+
+  @ApiProperty({
+    description: 'Suitable locations where the plant can thrive.',
+    required: false,
+  })
+  habitatLocation?: string;
 }

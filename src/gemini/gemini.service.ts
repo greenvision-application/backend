@@ -61,7 +61,7 @@ export class GeminiService {
       const response = await this.unsplash.search.getPhotos({
         query,
         perPage: 5,
-        orientation: 'portrait',
+        orientation: 'landscape',
       });
 
       if (!response.response || !response.response.results.length) {
