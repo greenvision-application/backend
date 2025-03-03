@@ -14,13 +14,30 @@ const validMimeTypes = [
 ];
 
 // Generation configuration
-const generationConfig = {
+const generalConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 40,
+  maxOutputTokens: 8192,
+  responseMimeType: 'text/plain',
+};
+
+const imageAnalysisConfig = {
   temperature: 1,
   topP: 0.95,
   topK: 40,
   maxOutputTokens: 8192,
   responseMimeType: 'application/json',
   responseSchema: aiSchema.scanImagePlantSchema,
+};
+
+const phaseGenerationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 40,
+  maxOutputTokens: 8192,
+  responseMimeType: 'application/json',
+  responseSchema: aiSchema.plantGrowthPhasesSchema,
 };
 
 export default {
@@ -30,5 +47,7 @@ export default {
   SYSTEM_INSTRUCTION,
   CACHE_TTL_SECONDS,
   validMimeTypes,
-  generationConfig,
+  generalConfig,
+  imageAnalysisConfig,
+  phaseGenerationConfig,
 };

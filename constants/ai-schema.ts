@@ -1,4 +1,4 @@
-import { SchemaType, ObjectSchema } from '@google/generative-ai';
+import { SchemaType, ObjectSchema, ArraySchema } from '@google/generative-ai';
 
 const scanImagePlantSchema: ObjectSchema = {
   description:
@@ -118,4 +118,164 @@ const scanImagePlantSchema: ObjectSchema = {
   ],
 };
 
-export default { scanImagePlantSchema };
+const plantGrowthPhasesSchema: ArraySchema = {
+  description:
+    'Schema for defining the growth phases of a plant, including phase details and care instructions.',
+  type: SchemaType.ARRAY,
+  items: {
+    type: SchemaType.OBJECT,
+    properties: {
+      phase_name: {
+        type: SchemaType.STRING,
+        description: 'Name of the plant growth phase.',
+        nullable: false,
+      },
+      desc: {
+        type: SchemaType.STRING,
+        description: 'Description of this growth phase.',
+        nullable: true,
+      },
+      size: {
+        type: SchemaType.NUMBER,
+        description: 'Size of the plant (cm) at this phase.',
+        nullable: false,
+      },
+      duration: {
+        type: SchemaType.NUMBER,
+        description:
+          'Total duration (hours) the plant spends in this growth phase.',
+        nullable: false,
+      },
+      care_instruction: {
+        type: SchemaType.OBJECT,
+        description: 'Care instructions for this phase.',
+        properties: {
+          water: {
+            type: SchemaType.OBJECT,
+            description:
+              'Watering schedule and details for the plant in this phase.',
+            properties: {
+              frequency: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  interval: {
+                    type: SchemaType.NUMBER,
+                    description: 'Interval between watering sessions.',
+                  },
+                  unit: {
+                    type: SchemaType.STRING,
+                    description: 'Unit of time (day, week, month).',
+                    enum: ['day', 'week', 'month'],
+                  },
+                },
+                required: ['interval', 'unit'],
+              },
+              amount: {
+                type: SchemaType.NUMBER,
+                description: 'Amount of water needed.',
+                nullable: false,
+              },
+              unit: {
+                type: SchemaType.STRING,
+                description: 'Unit for water measurement (ml, l).',
+                enum: ['ml', 'l'],
+              },
+            },
+            required: ['frequency', 'amount', 'unit'],
+          },
+          sunlight: {
+            type: SchemaType.STRING,
+            description: 'Sunlight requirement level in this phase.',
+            enum: ['NONE', 'VERY_LOW', 'LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'],
+          },
+          moisture: {
+            type: SchemaType.STRING,
+            description: 'Moisture level needed in this phase for the plant.',
+            enum: ['NONE', 'VERY_LOW', 'LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'],
+          },
+          temperature: {
+            type: SchemaType.OBJECT,
+            description: 'Optimal temperature range (°C).',
+            properties: {
+              min: {
+                type: SchemaType.NUMBER,
+                description: 'Minimum temperature in this phase.',
+              },
+              max: {
+                type: SchemaType.NUMBER,
+                description: 'Maximum temperature in this phase.',
+              },
+            },
+            required: ['min', 'max'],
+          },
+          fertilizer: {
+            type: SchemaType.OBJECT,
+            description: 'Fertilizer application details.',
+            properties: {
+              type: {
+                type: SchemaType.STRING,
+                description:
+                  'Type of fertilizer used in this phase of the plant.',
+              },
+              frequency: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  interval: {
+                    type: SchemaType.NUMBER,
+                    description: 'Interval between fertilization.',
+                  },
+                  unit: {
+                    type: SchemaType.STRING,
+                    description: 'Unit of time (day, week, month).',
+                    enum: ['day', 'week', 'month'],
+                  },
+                },
+                required: ['interval', 'unit'],
+              },
+            },
+            required: ['type', 'frequency'],
+            nullable: false,
+          },
+          pruning: {
+            type: SchemaType.OBJECT,
+            description: 'Pruning recommendations.',
+            properties: {
+              frequency: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  interval: {
+                    type: SchemaType.NUMBER,
+                    description: 'Interval between pruning sessions.',
+                  },
+                  unit: {
+                    type: SchemaType.STRING,
+                    description: 'Unit of time (day, week, month).',
+                    enum: ['day', 'week', 'month'],
+                  },
+                },
+                required: ['interval', 'unit'],
+              },
+              reason: {
+                type: SchemaType.STRING,
+                description: 'Reason for pruning the plant during this phase',
+              },
+            },
+            required: ['frequency', 'reason'],
+            nullable: false,
+          },
+        },
+        required: [
+          'water',
+          'sunlight',
+          'moisture',
+          'temperature',
+          'fertilizer',
+          'pruning',
+        ],
+      },
+    },
+    required: ['phase_name', 'size', 'duration', 'care_instruction'],
+  },
+};
+
+export default { scanImagePlantSchema, plantGrowthPhasesSchema };

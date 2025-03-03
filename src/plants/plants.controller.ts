@@ -22,6 +22,7 @@ import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
 import { PlantEntity } from './entities/plant.entity';
 import { UrlImagePlantDto } from './dto/url-image-plant.dto';
+import { GeneratePhaseDto } from './dto/generate-phase.dto';
 
 @Controller('plants')
 @ApiTags('Plants')
@@ -130,6 +131,26 @@ export class PlantsController {
       if (error instanceof NotFoundException) {
         throw error;
       }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('generate-phase')
+  @ApiOperation({ summary: 'Generate phase of plant' })
+  @ApiOkResponse({
+    description: 'Phase of plant generated successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Failed to generate phase of plant',
+  })
+  async generatePhase(@Body() generatePhaseDto: GeneratePhaseDto) {
+    try {
+      return await this.plantsService.generatePhasePlant(
+        generatePhaseDto.plant_name,
+        generatePhaseDto.scientific_name,
+      );
+    } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

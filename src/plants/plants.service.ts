@@ -129,4 +129,16 @@ export class PlantsService {
       throw new Error(`Failed to scan plant: ${error.message}`);
     }
   }
+
+  async generatePhasePlant(plant_name: string, scientificName: string) {
+    try {
+      const aiResponse = await this.geminiService.generatePhaseOfPlant(
+        plant_name,
+        scientificName,
+      );
+      return aiResponse;
+    } catch (error) {
+      throw new Error(`Failed to generate phase of plant: ${error.message}`);
+    }
+  }
 }
