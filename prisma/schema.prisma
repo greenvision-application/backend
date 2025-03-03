@@ -47,17 +47,6 @@ model Category {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model District {
-  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at    DateTime @default(now()) @db.Timestamptz(6)
-  district_name String   @db.VarChar
-  province_id   String   @db.Uuid
-  Province      Province @relation(fields: [province_id], references: [id], onDelete: Cascade)
-  Ward          Ward[]
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Notification {
   id         String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   created_at DateTime            @default(now()) @db.Timestamptz(6)
@@ -108,15 +97,6 @@ model Plant {
   User_Plant       User_Plant[]
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model Province {
-  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at    DateTime   @default(now()) @db.Timestamptz(6)
-  province_name String     @unique @db.VarChar
-  District      District[]
-}
-
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Role {
   id         String   @id(map: "Roles_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -138,6 +118,7 @@ model Task {
   Care_Schedule     Care_Schedule? @relation(fields: [care_schedule_id], references: [id], onDelete: Cascade)
 }
 
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model User {
@@ -147,12 +128,11 @@ model User {
   email        String?        @unique(map: "users_email_key") @db.VarChar
   phone_number String?        @unique(map: "users_phone_number_key") @db.VarChar
   role_id      String         @db.Uuid
-  ward_id      String?        @db.Uuid
   preferences  Json?
   is_active    Boolean        @default(true)
+  address      Json
   Notification Notification[]
   Role         Role           @relation(fields: [role_id], references: [id], onDelete: Cascade)
-  Ward         Ward?          @relation(fields: [ward_id], references: [id], onDelete: Cascade)
   User_Plant   User_Plant[]
 }
 
@@ -173,17 +153,6 @@ model User_Plant {
   Care_Schedule      Care_Schedule[]
   Plant              Plant           @relation(fields: [plant_id], references: [id], onDelete: Cascade)
   User               User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model Ward {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
-  ward_name   String   @db.VarChar
-  district_id String   @db.Uuid
-  User        User[]
-  District    District @relation(fields: [district_id], references: [id], onDelete: Cascade)
 }
 
 /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments

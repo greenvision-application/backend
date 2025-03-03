@@ -21,6 +21,7 @@ import { PlantsService } from './plants.service';
 import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
 import { PlantEntity } from './entities/plant.entity';
+import { UrlImagePlantDto } from './dto/url-image-plant.dto';
 
 @Controller('plants')
 @ApiTags('Plants')
@@ -30,6 +31,24 @@ export class PlantsController {
   @Post()
   create(@Body() createPlantDto: CreatePlantDto) {
     return this.plantsService.create(createPlantDto);
+  }
+
+  @Post('scan')
+  @ApiOperation({ summary: 'Scan plant from image URL' })
+  @ApiOkResponse({
+    description: 'Plant identification result',
+    type: PlantEntity,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Failed to scan plant',
+  })
+  async scanPlant(@Body() urlImagePlantDto: UrlImagePlantDto) {
+    try {
+      return await this.plantsService.scanPlant(urlImagePlantDto.imageUrl);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get()
