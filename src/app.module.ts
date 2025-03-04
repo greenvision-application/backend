@@ -13,6 +13,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
 import { PhaseModule } from './phase/phase.module';
 import { CareInstructionModule } from './care_instruction/care_instruction.module';
 import { UserPlantModule } from './user_plant/user_plant.module';
+import { CareScheduleModule } from './care_schedule/care_schedule.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
@@ -27,6 +28,7 @@ import { UserPlantModule } from './user_plant/user_plant.module';
     PhaseModule,
     CareInstructionModule,
     UserPlantModule,
+    CareScheduleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
