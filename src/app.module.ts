@@ -11,6 +11,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { GeminiModule } from './gemini/gemini.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { PhaseModule } from './phase/phase.module';
+import { CareInstructionModule } from './care_instruction/care_instruction.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
@@ -23,6 +24,7 @@ import { PhaseModule } from './phase/phase.module';
     GeminiModule,
     FileUploadModule,
     PhaseModule,
+    CareInstructionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
