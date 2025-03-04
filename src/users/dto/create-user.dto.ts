@@ -42,10 +42,7 @@ export class CreateUserDto
 
   @ApiProperty({ required: false, default: null })
   @IsOptional()
-  @IsNotEmpty()
-  @Transform(({ value }: TransformFnParams) => value?.trim())
-  @IsString()
-  ward_id?: string;
+  address: Prisma.InputJsonValue;
 
   @ApiProperty({ required: false, default: null })
   @IsOptional()

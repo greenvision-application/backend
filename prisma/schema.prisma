@@ -63,7 +63,7 @@ model Phase {
   created_at       DateTime          @default(now()) @db.Timestamptz(6)
   phase_name       String            @db.VarChar
   desc             String?
-  duration         BigInt
+  duration         Int               @db.SmallInt
   size             Float
   plant_id         String            @db.Uuid
   Care_instruction Care_instruction?

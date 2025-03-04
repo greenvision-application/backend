@@ -20,8 +20,8 @@ export class UserEntity implements User {
   @ApiProperty({ format: 'uuid' })
   role_id: string;
 
-  @ApiProperty({ format: 'uuid', nullable: true })
-  ward_id: string;
+  @ApiProperty({ nullable: false })
+  address: any;
 
   @ApiProperty({ nullable: true })
   preferences: any;

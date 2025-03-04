@@ -10,6 +10,7 @@ import { RolesModule } from './roles/roles.module';
 import { CategoriesModule } from './categories/categories.module';
 import { GeminiModule } from './gemini/gemini.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
+import { PhaseModule } from './phase/phase.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
@@ -21,6 +22,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
     CategoriesModule,
     GeminiModule,
     FileUploadModule,
+    PhaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
