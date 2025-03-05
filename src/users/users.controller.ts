@@ -1,7 +1,7 @@
 import {
   Controller,
   Get,
-  // Post,
+  Post,
   Body,
   Param,
   Delete,
@@ -16,12 +16,12 @@ import {
   ApiOkResponse,
   ApiTags,
   ApiOperation,
-  // ApiCreatedResponse,
+  ApiCreatedResponse,
   ApiResponse,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity/user.entity';
 import { UsersService } from './users.service';
-// import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
@@ -85,20 +85,20 @@ export class UsersController {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  // @Post()
-  // @ApiOperation({ summary: 'Create new user' })
-  // @ApiCreatedResponse({
-  //   description: 'The user has been successfully created.',
-  //   type: UserEntity,
-  // })
-  // @ApiResponse({
-  //   status: HttpStatus.BAD_REQUEST,
-  //   description:
-  //     'Username, email or phone number already exists, or email/phone number is required',
-  // })
-  // async create(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.createUser(createUserDto);
-  // }
+  @Post()
+  @ApiOperation({ summary: 'Create new user' })
+  @ApiCreatedResponse({
+    description: 'The user has been successfully created.',
+    type: UserEntity,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description:
+      'Username, email or phone number already exists, or email/phone number is required',
+  })
+  async create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.createUser(createUserDto);
+  }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update user by id' })

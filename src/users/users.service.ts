@@ -1,163 +1,178 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
-// import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '@prisma/client';
-import { BadRequestException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.user.findMany({
-      where: { is_active: true },
-      orderBy: { created_at: 'desc' },
-    });
-  }
-
-  // async createUser(createUserDto: CreateUserDto): Promise<User> {
-  //   const {
-  //     username,
-  //     email,
-  //     phone_number,
-  //     role_id,
-  //     ward_id,
-  //     preferences,
-  //     is_active,
-  //   } = createUserDto;
-
-  //   // Kiểm tra username đã tồn tại
-  //   const existingUserByUsername = await this.prisma.user.findUnique({
-  //     where: { username },
-  //   });
-  //   if (existingUserByUsername) {
-  //     throw new BadRequestException('Username đã tồn tại');
-  //   }
-
-  //   // Kiểm tra email đã tồn tại nếu có email
-  //   if (email) {
-  //     const existingUserByEmail = await this.prisma.user.findUnique({
-  //       where: { email },
-  //     });
-  //     if (existingUserByEmail) {
-  //       throw new BadRequestException('Email đã tồn tại');
-  //     }
-  //   }
-
-  //   // Kiểm tra phone_number đã tồn tại nếu có phone_number
-  //   if (phone_number) {
-  //     const existingUserByPhone = await this.prisma.user.findUnique({
-  //       where: { phone_number },
-  //     });
-  //     if (existingUserByPhone) {
-  //       throw new BadRequestException('Số điện thoại đã tồn tại');
-  //     }
-  //   }
-
-  //   // Nếu không có cả email và phone_number thì báo lỗi
-  //   if (!email && !phone_number) {
-  //     throw new BadRequestException('Bạn chưa điền email hoặc số điện thoại');
-  //   }
-
-  //   if (!role_id) {
-  //     throw new BadRequestException('Bạn chưa chọn role id');
-  //   }
-
-  //   return this.prisma.user.create({
-  //     data: {
-  //       username,
-  //       email,
-  //       phone_number,
-  //       role_id,
-  //       ward_id,
-  //       preferences,
-  //       is_active,
-  //     },
-  //   });
-  // }
-
-  async findOne(id: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+  async findAll(): Promise<User[]> {
+    try {
+      return await this.prisma.user.findMany({
+        where: { is_active: true },
+        orderBy: { created_at: 'desc' },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        error.message || 'Failed to retrieve users',
+      );
     }
-
-    return user;
   }
 
-  async remove(id: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
+  async findOne(id: string): Promise<User> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
 
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+
+      return user;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to retrieve user');
     }
-
-    return this.prisma.user.update({
-      where: { id },
-      data: { is_active: false },
-    });
   }
 
-  /*************  ✨ Codeium Command ⭐  *************/
-  /**
-   * Update a user by its id
-   *
-   * @param id ID of the user to be updated
-   * @param updateUserDto Data to be updated
-   * @returns The updated user
-   * @throws {NotFoundException} if the user with the given id does not exist
-   */
-  /******  57870a8b-0474-4e8d-b4b7-a5be59d18391  *******/
+  async remove(id: string): Promise<User> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
+
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+
+      return await this.prisma.user.update({
+        where: { id },
+        data: { is_active: false },
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to deactivate user');
+    }
+  }
+
   async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
 
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+
+      const { username, email, phone_number } = updateUserDto;
+
+      if (username) {
+        const existingUserByUsername = await this.prisma.user.findUnique({
+          where: { username },
+        });
+        if (existingUserByUsername && existingUserByUsername.id !== id) {
+          throw new BadRequestException('Username is already taken');
+        }
+      }
+
+      if (email) {
+        const existingUserByEmail = await this.prisma.user.findUnique({
+          where: { email },
+        });
+        if (existingUserByEmail && existingUserByEmail.id !== id) {
+          throw new BadRequestException('Email is already registered');
+        }
+      }
+
+      if (phone_number) {
+        const existingUserByPhone = await this.prisma.user.findUnique({
+          where: { phone_number },
+        });
+        if (existingUserByPhone && existingUserByPhone.id !== id) {
+          throw new BadRequestException('Phone number is already registered');
+        }
+      }
+
+      return await this.prisma.user.update({
+        where: { id },
+        data: updateUserDto,
+      });
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to update user');
     }
+  }
 
-    const { username, email, phone_number } = updateUserDto;
+  async createUser(createUserDto: {
+    username: string;
+    email?: string;
+    phone_number?: string;
+    role_id: string;
+    preferences?: any;
+    address: any;
+    is_active?: boolean;
+  }): Promise<User> {
+    try {
+      const { username, email, phone_number, role_id } = createUserDto;
 
-    // Kiểm tra username đã tồn tại (ngoại trừ user hiện tại)
-    if (username) {
+      if (!email && !phone_number) {
+        throw new BadRequestException('Email or phone number is required');
+      }
+
+      if (!role_id) {
+        throw new BadRequestException('Role ID is required');
+      }
+
       const existingUserByUsername = await this.prisma.user.findUnique({
         where: { username },
       });
-      if (existingUserByUsername && existingUserByUsername.id !== id) {
-        throw new BadRequestException('Username đã tồn tại');
+      if (existingUserByUsername) {
+        throw new BadRequestException('Username is already taken');
       }
-    }
 
-    // Kiểm tra email đã tồn tại (ngoại trừ user hiện tại)
-    if (email) {
-      const existingUserByEmail = await this.prisma.user.findUnique({
-        where: { email },
+      if (email) {
+        const existingUserByEmail = await this.prisma.user.findUnique({
+          where: { email },
+        });
+        if (existingUserByEmail) {
+          throw new BadRequestException('Email is already registered');
+        }
+      }
+
+      if (phone_number) {
+        const existingUserByPhone = await this.prisma.user.findUnique({
+          where: { phone_number },
+        });
+        if (existingUserByPhone) {
+          throw new BadRequestException('Phone number is already registered');
+        }
+      }
+
+      return await this.prisma.user.create({
+        data: createUserDto,
       });
-      if (existingUserByEmail && existingUserByEmail.id !== id) {
-        throw new BadRequestException('Email đã tồn tại');
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
       }
+      throw new InternalServerErrorException('Failed to create user');
     }
-
-    // Kiểm tra phone_number đã tồn tại (ngoại trừ user hiện tại)
-    if (phone_number) {
-      const existingUserByPhone = await this.prisma.user.findUnique({
-        where: { phone_number },
-      });
-      if (existingUserByPhone && existingUserByPhone.id !== id) {
-        throw new BadRequestException('Số điện thoại đã tồn tại');
-      }
-    }
-
-    return this.prisma.user.update({
-      where: { id },
-      data: updateUserDto,
-    });
   }
 }
