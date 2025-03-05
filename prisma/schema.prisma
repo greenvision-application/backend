@@ -92,6 +92,7 @@ model Plant {
   maxMatureSize    Float            @db.Real
   humidityRange    LEVEL            @default(MEDIUM)
   lightRequirement LEVEL            @default(MEDIUM)
+  approved_content Boolean          @default(false)
   Phase            Phase[]
   Category         Category         @relation(fields: [category_id], references: [id], onDelete: Cascade)
   User_Plant       User_Plant[]

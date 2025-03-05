@@ -10,13 +10,15 @@ export class PlantsService {
     private prisma: PrismaService,
     private readonly geminiService: GeminiService,
   ) {}
-  create(plantData: CreatePlantDto) {
-    return this.prisma.plant.create({ data: plantData });
+  async create(plantData: CreatePlantDto) {
+    return await this.prisma.plant.create({ data: plantData });
   }
-
   async findAll() {
     try {
       const plants = await this.prisma.plant.findMany({
+        where: {
+          approved_content: true,
+        },
         orderBy: { created_at: 'desc' },
       });
       if (!plants || plants.length === 0) {
