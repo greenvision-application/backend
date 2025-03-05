@@ -3,12 +3,16 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
 import { GeminiService } from '@/gemini/gemini.service';
+import { PhaseService } from '@/phase/phase.service';
+import { CareInstructionService } from '@/care_instruction/care_instruction.service';
 
 @Injectable()
 export class PlantsService {
   constructor(
     private prisma: PrismaService,
     private readonly geminiService: GeminiService,
+    private readonly phaseService: PhaseService,
+    private readonly careInstructionService: CareInstructionService,
   ) {}
   async create(plantData: CreatePlantDto) {
     return await this.prisma.plant.create({ data: plantData });
@@ -141,6 +145,49 @@ export class PlantsService {
       return aiResponse;
     } catch (error) {
       throw new Error(`Failed to generate phase of plant: ${error.message}`);
+    }
+  }
+
+  async createPlantPhaseWithAI(
+    plant_name: string,
+    scientific_name: string,
+    plant_id: string,
+  ) {
+    try {
+      const phaseResult = await this.geminiService.generatePhaseOfPlant(
+        plant_name,
+        scientific_name,
+      );
+
+      for (const phase of phaseResult) {
+        // Tạo record phase
+        const createdPhase = await this.phaseService.create({
+          phase_name: phase.phase_name,
+          duration: phase.duration,
+          size: phase.size,
+          desc: phase.desc,
+          plant_id,
+        });
+
+        // Tạo record care_instruction
+        await this.careInstructionService.create({
+          water: phase.care_instruction.water,
+          sunlight: phase.care_instruction.sunlight,
+          moisture: phase.care_instruction.moisture,
+          temperature: phase.care_instruction.temperature,
+          fertilizer: phase.care_instruction.fertilizer,
+          pruning: phase.care_instruction.pruning,
+          phase_id: createdPhase.id,
+        });
+      }
+
+      return {
+        message: 'Plant phases and care instructions created successfully',
+      };
+    } catch (error) {
+      throw new Error(
+        `Failed to create plant phases and care instructions: ${error.message}`,
+      );
     }
   }
 }

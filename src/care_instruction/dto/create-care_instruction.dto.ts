@@ -38,13 +38,13 @@ export class CreateCareInstructionDto
   @IsJSON()
   @IsOptional()
   @Transform(({ value }) => (value ? JSON.stringify(value) : undefined))
-  fertilizer?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+  fertilizer?: any;
 
   @ApiPropertyOptional({ description: 'Pruning instructions in JSON format' })
   @IsJSON()
   @IsOptional()
   @Transform(({ value }) => (value ? JSON.stringify(value) : undefined))
-  pruning?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+  pruning?: any;
 
   @ApiPropertyOptional({ description: 'Phase ID in UUID format' })
   @IsUUID()

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { LEVEL } from '@prisma/client';
 
 class WaterFrequencyDTO {
   @ApiProperty({ description: 'Interval between watering sessions.' })
@@ -79,15 +80,15 @@ class CareInstructionDTO {
 
   @ApiProperty({
     description: 'Sunlight requirement level in this phase.',
-    enum: ['NONE', 'VERY_LOW', 'LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'],
+    enum: LEVEL,
   })
-  sunlight: string;
+  sunlight: LEVEL;
 
   @ApiProperty({
     description: 'Moisture level needed in this phase.',
-    enum: ['NONE', 'VERY_LOW', 'LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'],
+    enum: LEVEL,
   })
-  moisture: string;
+  moisture: LEVEL;
 
   @ApiProperty({ description: 'Optimal temperature range (°C).' })
   temperature: TemperatureDTO;

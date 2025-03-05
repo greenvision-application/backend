@@ -190,7 +190,7 @@ export class GeminiService {
   async generatePhaseOfPlant(
     plant_name: string,
     scientificName: string,
-  ): Promise<PlantGrowthPhaseDTO> {
+  ): Promise<PlantGrowthPhaseDTO[]> {
     try {
       const handlePrompt = promptToGeneratePhasePlant.promptToGeneratePhaseEn(
         plant_name,
@@ -199,7 +199,7 @@ export class GeminiService {
       const geminiResult =
         await this.modelPhaseGeneration.generateContent(handlePrompt);
       const processAIResponse =
-        await this.processAIResponse<PlantGrowthPhaseDTO>(geminiResult);
+        await this.processAIResponse<PlantGrowthPhaseDTO[]>(geminiResult);
       return processAIResponse;
     } catch (error) {
       this.logger.error('Error generate phases for plant :', error);

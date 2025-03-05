@@ -4,10 +4,13 @@ import { IsString, IsNumber, IsUUID, IsOptional } from 'class-validator';
 
 export class CreatePhaseDto
   implements
-    Omit<Prisma.PhaseCreateInput, 'id' | 'created_at' | ' Care_instruction'>
+    Omit<
+      Prisma.PhaseCreateInput,
+      'id' | 'created_at' | 'Care_instruction' | 'Plant'
+    >
 {
   Care_instruction?: Prisma.Care_instructionCreateNestedOneWithoutPhaseInput;
-  Plant: Prisma.PlantCreateNestedOneWithoutPhaseInput;
+  Plant?: Prisma.PlantCreateNestedOneWithoutPhaseInput;
   @ApiProperty({ description: 'Phase name', example: 'Seedling' })
   @IsString()
   phase_name: string;
