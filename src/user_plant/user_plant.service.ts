@@ -117,4 +117,185 @@ export class UserPlantService {
       );
     }
   }
+
+  async getPlantInforToPrompt(id: string) {
+    try {
+      const userPlant = await this.prisma.user_Plant.findUnique({
+        where: { id },
+        select: {
+          growth_stage: true,
+          plant_site: true,
+          planting_date: true,
+          caring_plant_infor: true,
+          Plant: {
+            select: {
+              plant_name: true,
+              scientific_name: true,
+              overview: true,
+              difficulty_level: true,
+              soil_type: true,
+              habitatLocation: true,
+              minTemperature: true,
+              maxTemperature: true,
+              minMatureSize: true,
+              maxMatureSize: true,
+              humidityRange: true,
+              lightRequirement: true,
+              Category: {
+                select: {
+                  category_name: true,
+                },
+              },
+              Phase: {
+                select: {
+                  phase_name: true,
+                  desc: true,
+                  duration: true,
+                  size: true,
+                  Care_instruction: {
+                    select: {
+                      water: true,
+                      sunlight: true,
+                      moisture: true,
+                      temperature: true,
+                      fertilizer: true,
+                      pruning: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!userPlant) {
+        throw new HttpException(
+          `Plant with ID ${id} not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      const growthStage = await this.prisma.phase.findUnique({
+        where: { id: userPlant.growth_stage },
+        select: { phase_name: true },
+      });
+
+      userPlant.growth_stage = growthStage?.phase_name || null;
+
+      const formattedData = {
+        plant_name: {
+          description: 'Tên thông thường của cây tại Việt Nam',
+          value: userPlant.Plant?.plant_name || null,
+        },
+        scientific_name: {
+          description: 'Tên khoa học của cây',
+          value: userPlant.Plant?.scientific_name || null,
+        },
+        overview: {
+          description: 'Tóm tắt về cây',
+          value: userPlant.Plant?.overview || null,
+        },
+        difficulty_level: {
+          description: 'Mức độ khó khi chăm sóc cây',
+          value: userPlant.Plant?.difficulty_level || null,
+        },
+        soil_type: {
+          description: 'Loại đất thích hợp cho cây',
+          value: userPlant.Plant?.soil_type || null,
+        },
+        habitatLocation: {
+          description: 'Vị trí thích hợp để trồng cây',
+          value: userPlant.Plant?.habitatLocation || null,
+        },
+        minTemperature: {
+          description: 'Nhiệt độ tối thiểu cây có thể chịu được',
+          value: userPlant.Plant?.minTemperature || null,
+        },
+        maxTemperature: {
+          description: 'Nhiệt độ tối đa cây có thể chịu được',
+          value: userPlant.Plant?.maxTemperature || null,
+        },
+        minMatureSize: {
+          description: 'Kích thước nhỏ nhất khi cây trưởng thành',
+          value: userPlant.Plant?.minMatureSize || null,
+        },
+        maxMatureSize: {
+          description: 'Kích thước lớn nhất khi cây trưởng thành',
+          value: userPlant.Plant?.maxMatureSize || null,
+        },
+        humidityRange: {
+          description:
+            'Phạm vi độ ẩm phù hợp với cây (NONE, VERY_LOW, LOW, MEDIUM, HIGH, VERY_HIGH)',
+          value: userPlant.Plant?.humidityRange || null,
+        },
+        lightRequirement: {
+          description:
+            'Lượng ánh sáng cần thiết (NONE, VERY_LOW, LOW, MEDIUM, HIGH, VERY_HIGH)',
+          value: userPlant.Plant?.lightRequirement || null,
+        },
+        category: {
+          description: 'Loại cây theo danh mục',
+          value: userPlant.Plant?.Category?.category_name || null,
+        },
+        phase:
+          userPlant.Plant?.Phase?.map((p) => ({
+            phase_name: {
+              description: 'Tên giai đoạn phát triển của cây',
+              value: p.phase_name || null,
+            },
+            desc: {
+              description: 'Mô tả về giai đoạn phát triển này',
+              value: p.desc || null,
+            },
+            duration: {
+              description: 'Tổng số giờ cây ở trong giai đoạn này',
+              value: p.duration || null,
+            },
+            size: {
+              description: 'Kích thước trung bình trong giai đoạn này',
+              value: p.size || null,
+            },
+            care_instruction: p.Care_instruction
+              ? {
+                  water: {
+                    description: 'Lượng nước cần tưới',
+                    value: p.Care_instruction.water,
+                  },
+                  sunlight: {
+                    description: 'Mức độ ánh sáng cần thiết',
+                    value: p.Care_instruction.sunlight,
+                  },
+                  moisture: {
+                    description: 'Độ ẩm yêu cầu',
+                    value: p.Care_instruction.moisture,
+                  },
+                  temperature: {
+                    description: 'Nhiệt độ lý tưởng',
+                    value: p.Care_instruction.temperature,
+                  },
+                  fertilizer: {
+                    description: 'Lượng phân bón cần thiết',
+                    value: p.Care_instruction.fertilizer,
+                  },
+                  pruning: {
+                    description: 'Cần tỉa cây hay không',
+                    value: p.Care_instruction.pruning,
+                  },
+                }
+              : null,
+          })) || [],
+      };
+
+      return formattedData;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        `Failed to get plant information: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

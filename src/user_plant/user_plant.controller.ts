@@ -106,4 +106,23 @@ export class UserPlantController {
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     return await this.userPlantService.remove(id);
   }
+
+  @Get('get-plant-info/:id')
+  @ApiOperation({ summary: 'Get plant information for prompt generation' })
+  @ApiParam({ name: 'id', description: 'User plant ID (UUID)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Retrieved plant information successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User plant not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async getPlantInfoForPrompt(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.userPlantService.getPlantInforToPrompt(id);
+  }
 }

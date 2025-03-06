@@ -2,14 +2,24 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateCareScheduleDto } from './dto/create-care_schedule.dto';
 import { UpdateCareScheduleDto } from './dto/update-care_schedule.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { GeminiService } from '@/gemini/gemini.service';
+import { UserPlantService } from '@/user_plant/user_plant.service';
+import { TasksService } from '@/tasks/tasks.service';
+import { TASK_STATUS } from '@prisma/client';
 
 @Injectable()
 export class CareScheduleService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private geminiService: GeminiService,
+    private userPlantService: UserPlantService,
+    private taskService: TasksService,
+  ) {}
 
   async create(createCareScheduleDto: CreateCareScheduleDto) {
     try {
@@ -144,6 +154,72 @@ export class CareScheduleService {
         throw error;
       }
       throw new BadRequestException('Failed to delete care schedule');
+    }
+  }
+
+  async generateSchedule(user_plant_id: string) {
+    try {
+      if (!user_plant_id) {
+        throw new BadRequestException('User Plant ID is required');
+      }
+
+      const userPlant = await this.userPlantService.findOne(user_plant_id);
+
+      if (!userPlant) {
+        throw new NotFoundException(
+          `User plant with ID ${user_plant_id} not found`,
+        );
+      }
+
+      const plantData =
+        await this.userPlantService.getPlantInforToPrompt(user_plant_id);
+
+      const schedules =
+        await this.geminiService.generateScheduleTakeCarePlant(plantData);
+
+      const createdCareSchedules = [];
+
+      for (const schedule of schedules) {
+        try {
+          const careSchedule = await this.prisma.care_Schedule.create({
+            data: {
+              start_date: new Date(schedule.start_date),
+              end_date: new Date(schedule.end_date),
+              user_plant_id: user_plant_id,
+            },
+          });
+
+          const tasks = await this.prisma.task.createMany({
+            data: schedule.tasks.map((task) => ({
+              task_date: new Date(task.task_date),
+              task_time: new Date(
+                `${task.task_date}T${task.task_time}:00.000Z`,
+              ),
+              content: task.content,
+              completion_status: TASK_STATUS.NOT_YET,
+              care_schedule_id: careSchedule.id,
+            })),
+          });
+
+          createdCareSchedules.push({ careSchedule, tasks });
+        } catch (dbError) {
+          throw new InternalServerErrorException(
+            dbError.message || 'Failed to save schedule to database',
+          );
+        }
+      }
+
+      return createdCareSchedules;
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'An unexpected error occurred while generating the care schedule',
+      );
     }
   }
 }

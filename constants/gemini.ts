@@ -40,6 +40,15 @@ const phaseGenerationConfig = {
   responseSchema: aiSchema.plantGrowthPhasesSchema,
 };
 
+const scheduleGenerationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 40,
+  maxOutputTokens: 8192,
+  responseMimeType: 'application/json',
+  responseSchema: aiSchema.careScheduleSchema,
+};
+
 export default {
   BOT_ERROR_MESSAGE,
   GEMINI_MODEL_NAME,
@@ -50,4 +59,5 @@ export default {
   generalConfig,
   imageAnalysisConfig,
   phaseGenerationConfig,
+  scheduleGenerationConfig,
 };

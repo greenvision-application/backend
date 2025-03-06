@@ -15,8 +15,10 @@ import gemini from 'constants/gemini';
 import keys from 'constants/keys';
 import promptToScan from 'constants/prompts/to-scan';
 import promptToGeneratePhasePlant from 'constants/prompts/to-generate-phases';
+import promptToGenerateSchedule from 'constants/prompts/to-generate-schedule';
 import { PlantResponseDTO } from './dto/ai-scan-plant-response.dto';
 import { PlantGrowthPhaseDTO } from './dto/plant-growth-phase.dto';
+import { CareScheduleDto } from './dto/care-schedule.dto';
 
 @Injectable()
 export class GeminiService {
@@ -24,6 +26,7 @@ export class GeminiService {
   private readonly modelGeneral: GenerativeModel;
   private readonly modelImageAnalysis: GenerativeModel;
   private readonly modelPhaseGeneration: GenerativeModel;
+  private readonly modelScheduleGeneration: GenerativeModel;
   private readonly fileManager: GoogleAIFileManager;
   private chatSessions: { [sessionId: string]: ChatSession } = {};
   private readonly logger = new Logger(GeminiService.name);
@@ -45,6 +48,10 @@ export class GeminiService {
     this.modelPhaseGeneration = this.googleAI.getGenerativeModel({
       model: gemini.GEMINI_MODEL_NAME,
       generationConfig: gemini.phaseGenerationConfig,
+    });
+    this.modelScheduleGeneration = this.googleAI.getGenerativeModel({
+      model: gemini.GEMINI_MODEL_NAME,
+      generationConfig: gemini.scheduleGenerationConfig,
     });
     this.unsplash = createApi({ accessKey: unsplashAccessKey });
   }
@@ -203,6 +210,24 @@ export class GeminiService {
       return processAIResponse;
     } catch (error) {
       this.logger.error('Error generate phases for plant :', error);
+    }
+  }
+
+  async generateScheduleTakeCarePlant(
+    getUserPlantData: any,
+  ): Promise<CareScheduleDto[]> {
+    try {
+      const handlePrompt =
+        promptToGenerateSchedule.promptToGenerateCareScheduleVi(
+          getUserPlantData,
+        );
+      const geminiResult =
+        await this.modelScheduleGeneration.generateContent(handlePrompt);
+      const processAIResponse =
+        await this.processAIResponse<CareScheduleDto[]>(geminiResult);
+      return processAIResponse;
+    } catch (error) {
+      this.logger.error('Error generate schedule for plant :', error);
     }
   }
 }

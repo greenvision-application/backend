@@ -278,4 +278,58 @@ const plantGrowthPhasesSchema: ArraySchema = {
   },
 };
 
-export default { scanImagePlantSchema, plantGrowthPhasesSchema };
+const careScheduleSchema: ArraySchema = {
+  description:
+    'Schema for scheduling plant care tasks based on plant details and care instructions.',
+  type: SchemaType.ARRAY,
+  items: {
+    type: SchemaType.OBJECT,
+    description:
+      'Details of the care schedule for a specific plant based on information about the plants growth stages and plant care instructions.',
+    properties: {
+      start_date: {
+        type: SchemaType.STRING,
+        description: 'Start date of the care schedule (YYYY-MM-DD).',
+        nullable: false,
+      },
+      end_date: {
+        type: SchemaType.STRING,
+        description: 'End date of the care schedule (YYYY-MM-DD).',
+        nullable: false,
+      },
+      tasks: {
+        type: SchemaType.ARRAY,
+        description:
+          'List of plant care tasks that need to be performed on the schedule.',
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            task_date: {
+              type: SchemaType.STRING,
+              description: 'Date of the task (YYYY-MM-DD).',
+              nullable: false,
+            },
+            task_time: {
+              type: SchemaType.STRING,
+              description: 'Time to perform the task (HH:MM).',
+              nullable: false,
+            },
+            content: {
+              type: SchemaType.STRING,
+              description: 'Description of the care task.',
+              nullable: false,
+            },
+          },
+          required: ['task_date', 'content', 'task_time'],
+        },
+      },
+    },
+    required: ['start_date', 'end_date', 'tasks'],
+  },
+};
+
+export default {
+  scanImagePlantSchema,
+  plantGrowthPhasesSchema,
+  careScheduleSchema,
+};

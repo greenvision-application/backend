@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   HttpStatus,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { CareScheduleService } from './care_schedule.service';
 import { CreateCareScheduleDto } from './dto/create-care_schedule.dto';
@@ -108,5 +109,15 @@ export class CareScheduleController {
   })
   async remove(@Param('id') id: string) {
     return await this.careScheduleService.remove(id);
+  }
+
+  @ApiOperation({ summary: 'Generate plant care schedule' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return AI generated plant care schedule',
+  })
+  @Post(':id')
+  promptSchedule(@Param('id', ParseUUIDPipe) id: string) {
+    return this.careScheduleService.generateSchedule(id);
   }
 }
