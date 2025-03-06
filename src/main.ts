@@ -16,6 +16,14 @@ async function bootstrap() {
     .setTitle('GreenVision')
     .setDescription('The GreenVision API description')
     .setVersion('0.1')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
     .build();
 
   app.useGlobalPipes(new ValidationPipe());

@@ -14,6 +14,7 @@ import { PhaseModule } from './phase/phase.module';
 import { CareInstructionModule } from './care_instruction/care_instruction.module';
 import { UserPlantModule } from './user_plant/user_plant.module';
 import { CareScheduleModule } from './care_schedule/care_schedule.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
@@ -29,6 +30,7 @@ import { CareScheduleModule } from './care_schedule/care_schedule.module';
     CareInstructionModule,
     UserPlantModule,
     CareScheduleModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
