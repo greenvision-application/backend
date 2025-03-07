@@ -8,6 +8,7 @@ const emailHost = 'EMAIL_HOST';
 const emailPort = 'EMAIL_PORT';
 const emailUser = 'EMAIL_USER';
 const emailPassword = 'EMAIL_PASSWORD';
+const secretJwt = 'SECRET_JWT';
 
 export default {
   geminiKey,
@@ -19,4 +20,5 @@ export default {
   emailPassword,
   emailPort,
   emailUser,
+  secretJwt,
 };

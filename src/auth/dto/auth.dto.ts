@@ -1,7 +1,31 @@
-export class AuthPayloadDto {
-  username: string;
+import { ApiProperty } from '@nestjs/swagger';
 
-  password: string;
+export class AuthPayloadDto {
+  @ApiProperty({
+    description: 'Username of the user',
+    required: false,
+    example: 'Kai',
+  })
+  username?: string;
+
+  @ApiProperty({
+    description: 'Password of the user',
+    required: false,
+    example: 'password123!',
+  })
+  password?: string;
+
+  @ApiProperty({
+    description: 'Email of the user',
+    required: true,
+    example: 'kai@example.com',
+  })
   email: string;
+
+  @ApiProperty({
+    description: 'Role ID of the user',
+    required: false,
+    example: '7a824cc3-5bc8-4bc6-a03d-1d4541782134',
+  })
   role_id?: string;
 }

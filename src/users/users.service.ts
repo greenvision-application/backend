@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '@/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -76,7 +77,7 @@ export class UsersService {
         throw new NotFoundException(`User with ID ${id} not found`);
       }
 
-      const { username, email, phone_number } = updateUserDto;
+      const { username, email } = updateUserDto;
 
       if (username) {
         const existingUserByUsername = await this.prisma.user.findUnique({
@@ -96,15 +97,6 @@ export class UsersService {
         }
       }
 
-      if (phone_number) {
-        const existingUserByPhone = await this.prisma.user.findUnique({
-          where: { phone_number },
-        });
-        if (existingUserByPhone && existingUserByPhone.id !== id) {
-          throw new BadRequestException('Phone number is already registered');
-        }
-      }
-
       return await this.prisma.user.update({
         where: { id },
         data: updateUserDto,
@@ -120,31 +112,25 @@ export class UsersService {
     }
   }
 
-  async createUser(createUserDto: {
-    username: string;
-    email?: string;
-    phone_number?: string;
-    role_id: string;
-    preferences?: any;
-    address: any;
-    is_active?: boolean;
-  }): Promise<User> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const { username, email, phone_number, role_id } = createUserDto;
+      const { username, email, role_id } = createUserDto;
 
-      if (!email && !phone_number) {
-        throw new BadRequestException('Email or phone number is required');
+      if (!email) {
+        throw new BadRequestException('Email is required');
       }
 
       if (!role_id) {
         throw new BadRequestException('Role ID is required');
       }
 
-      const existingUserByUsername = await this.prisma.user.findUnique({
-        where: { username },
-      });
-      if (existingUserByUsername) {
-        throw new BadRequestException('Username is already taken');
+      if (username) {
+        const existingUserByUsername = await this.prisma.user.findUnique({
+          where: { username },
+        });
+        if (existingUserByUsername) {
+          throw new BadRequestException('Username is already taken');
+        }
       }
 
       if (email) {
@@ -156,18 +142,10 @@ export class UsersService {
         }
       }
 
-      if (phone_number) {
-        const existingUserByPhone = await this.prisma.user.findUnique({
-          where: { phone_number },
-        });
-        if (existingUserByPhone) {
-          throw new BadRequestException('Phone number is already registered');
-        }
-      }
-
-      return await this.prisma.user.create({
+      const newUser = await this.prisma.user.create({
         data: createUserDto,
       });
+      return newUser;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;

@@ -17,9 +17,6 @@ export class UserEntity implements User {
   @ApiProperty({ nullable: true })
   email: string;
 
-  @ApiProperty({ nullable: true })
-  phone_number: string;
-
   @ApiProperty({ format: 'uuid' })
   role_id: string;
 

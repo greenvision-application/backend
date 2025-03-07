@@ -40,4 +40,13 @@ export class EmailService {
       console.log('Error sending mail: ', error);
     }
   }
+
+  async sendOTP(email: string, otp: string) {
+    const htmlContent = `<p>Mã OTP của bạn là: <strong>${otp}</strong>. Mã có hiệu lực trong 5 phút.</p>`;
+    await this.sendEmail({
+      recipients: [email],
+      subject: 'Mã OTP xác thực',
+      html: htmlContent,
+    });
+  }
 }

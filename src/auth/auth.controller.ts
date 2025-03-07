@@ -4,6 +4,8 @@ import { LocalGuard } from './guards/local.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { Request } from 'express';
 import { ApiTags, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { AuthPayloadDto } from './dto/auth.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -11,18 +13,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  @ApiBody({
-    schema: {
-      example: {
-        username: 'user1',
-        email: 'user1@gmail.com',
-        password: 'password',
-      },
-    },
-  })
-  async register(
-    @Body() body: { username: string; email: string; password: string },
-  ) {
+  async register(@Body() body: AuthPayloadDto) {
     return this.authService.register(body);
   }
 
@@ -40,5 +31,10 @@ export class AuthController {
   @ApiBearerAuth('access-token')
   async status(@Req() req: Request) {
     return req.user;
+  }
+
+  @Post('verify-otp')
+  async verifyOTP(@Body() body: VerifyOtpDto) {
+    return this.authService.verifyOTP(body);
   }
 }
