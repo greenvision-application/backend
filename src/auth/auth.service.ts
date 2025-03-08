@@ -1,6 +1,7 @@
 import {
   Injectable,
   BadRequestException,
+  ConflictException,
   UnauthorizedException,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -38,7 +39,7 @@ export class AuthService {
       });
 
       if (existingUser) {
-        throw new BadRequestException('Email already exists');
+        throw new ConflictException('Email already exists');
       }
 
       const otp = this.generateOTP();
@@ -47,7 +48,10 @@ export class AuthService {
       await this.emailSerVice.sendOTP(email, otp);
       return { message: 'OTP code has been sent to your email' };
     } catch (error) {
-      if (error instanceof BadRequestException) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof ConflictException
+      ) {
         throw error;
       }
       throw new InternalServerErrorException('Failed to register user');
