@@ -43,7 +43,7 @@ export class AuthService {
       }
 
       const otp = this.generateOTP();
-      this.otpStore.set(email, { otp, expires: Date.now() + 5 * 60 * 1000 });
+      this.otpStore.set(email, { otp, expires: Date.now() + 60 * 1000 });
 
       await this.emailSerVice.sendOTP(email, otp);
       return { message: 'OTP code has been sent to your email' };
