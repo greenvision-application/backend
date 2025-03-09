@@ -298,4 +298,33 @@ export class UserPlantService {
       );
     }
   }
+
+  async findSchedulePlant(client_id: string) {
+    console.log(client_id);
+    try {
+      const userPlants = await this.prisma.user_Plant.findMany({
+        where: {
+          user_id: client_id,
+        },
+        select: {
+          id: true,
+          nickname: true,
+          plant_site: true,
+          image_url: true,
+          Plant: {
+            select: {
+              plant_name: true,
+              image_url: true,
+            },
+          },
+        },
+      });
+      return userPlants;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to fetch user plants',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

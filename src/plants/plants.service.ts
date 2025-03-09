@@ -74,6 +74,29 @@ export class PlantsService {
     try {
       const plant = await this.prisma.plant.findUnique({
         where: { id },
+        select: {
+          characteristic: true,
+          plant_name: true,
+          scientific_name: true,
+          overview: true,
+          function: true,
+          meaning: true,
+          image_url: true,
+          difficulty_level: true,
+          soil_type: true,
+          habitatLocation: true,
+          minMatureSize: true,
+          maxMatureSize: true,
+          minTemperature: true,
+          maxTemperature: true,
+          humidityRange: true,
+          lightRequirement: true,
+          Category: {
+            select: {
+              category_name: true,
+            },
+          },
+        },
       });
 
       if (!plant) {

@@ -8,11 +8,20 @@ import {
   Delete,
   HttpStatus,
   ParseUUIDPipe,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserPlantService } from './user_plant.service';
 import { CreateUserPlantDto } from './dto/create-user_plant.dto';
 import { UpdateUserPlantDto } from './dto/update-user_plant.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 
 @ApiTags('User Plants')
 @Controller('user-plant')
@@ -45,6 +54,14 @@ export class UserPlantController {
   })
   async findAll() {
     return await this.userPlantService.findAll();
+  }
+
+  @Get('client-schedule')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async getTimeline(@Req() req: any) {
+    console.log('inside controller::::', req);
+    return this.userPlantService.findSchedulePlant(req.user?.id);
   }
 
   @Get(':id')
