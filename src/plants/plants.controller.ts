@@ -10,12 +10,15 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { PlantsService } from './plants.service';
 import { CreatePlantDto } from './dto/create-plant.dto';
@@ -23,6 +26,7 @@ import { UpdatePlantDto } from './dto/update-plant.dto';
 import { PlantEntity } from './entities/plant.entity';
 import { UrlImagePlantDto } from './dto/url-image-plant.dto';
 import { GeneratePhaseDto } from './dto/generate-phase.dto';
+import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 
 @Controller('plants')
 @ApiTags('Plants')
@@ -64,6 +68,13 @@ export class PlantsController {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @Get('client-plants')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async getAllPlants(@Req() req: any) {
+    return this.plantsService.findAllForClient(req.user?.id);
   }
 
   @Get(':id')

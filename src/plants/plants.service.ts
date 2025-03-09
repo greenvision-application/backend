@@ -37,6 +37,39 @@ export class PlantsService {
     }
   }
 
+  async findAllForClient(client_id: string) {
+    console.log(client_id);
+    try {
+      const plants = await this.prisma.plant.findMany({
+        where: {
+          approved_content: true,
+        },
+        select: {
+          plant_name: true,
+          image_url: true,
+          id: true,
+          User_Plant: {
+            where: { user_id: client_id },
+            select: {
+              favorite: true,
+              nickname: true,
+            },
+          },
+        },
+        orderBy: { created_at: 'desc' },
+      });
+      if (!plants || plants.length === 0) {
+        throw new NotFoundException('No plants found');
+      }
+      return plants;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(`Failed to fetch plants: ${error.message}`);
+    }
+  }
+
   async findOne(id: string) {
     try {
       const plant = await this.prisma.plant.findUnique({
