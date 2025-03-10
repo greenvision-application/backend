@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty } from 'class-validator';
+import { Transform, TransformFnParams } from 'class-transformer';
 
 export class AuthPayloadDto {
   @ApiProperty({
@@ -20,6 +22,9 @@ export class AuthPayloadDto {
     required: true,
     example: 'kai@example.com',
   })
+  @IsEmail()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @IsNotEmpty()
   email: string;
 
   @ApiProperty({

@@ -300,7 +300,6 @@ export class UserPlantService {
   }
 
   async findSchedulePlant(client_id: string) {
-    console.log(client_id);
     try {
       const userPlants = await this.prisma.user_Plant.findMany({
         where: {

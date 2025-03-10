@@ -120,4 +120,20 @@ export class PhaseService {
       throw new Error(`Failed to delete phase: ${error.message}`);
     }
   }
+
+  async findAllForClient(id: string) {
+    try {
+      return await this.prisma.phase.findMany({
+        where: {
+          plant_id: id,
+        },
+        select: {
+          phase_name: true,
+          id: true,
+        },
+      });
+    } catch (error) {
+      throw new Error(`Failed to fetch phases: ${error.message}`);
+    }
+  }
 }

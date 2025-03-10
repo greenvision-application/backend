@@ -73,6 +73,26 @@ export class PhaseController {
     }
   }
 
+  @Get('plant-phase/:id')
+  @ApiOperation({ summary: 'Get a phase by id of plant' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Return the phase' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Phase not found' })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid UUID format',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async getPlantPhase(@Param('id', ParseUUIDPipe) id: string) {
+    try {
+      return await this.phaseService.findAllForClient(id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Update a phase' })
   @ApiResponse({
