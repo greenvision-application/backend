@@ -10,7 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { GeminiService } from '@/gemini/gemini.service';
 import { UserPlantService } from '@/user_plant/user_plant.service';
 import { TasksService } from '@/tasks/tasks.service';
-import { TASK_STATUS } from '@prisma/client';
+// import { TASK_STATUS } from '@prisma/client';
 
 @Injectable()
 export class CareScheduleService {
@@ -40,6 +40,8 @@ export class CareScheduleService {
           start_date: createCareScheduleDto.start_date,
           end_date: createCareScheduleDto.end_date,
           user_plant_id: createCareScheduleDto.user_plant_id,
+          phase_name: createCareScheduleDto.phase_name,
+          desc: createCareScheduleDto.desc,
         },
       });
     } catch (error) {
@@ -123,6 +125,8 @@ export class CareScheduleService {
           start_date: updateCareScheduleDto.start_date,
           end_date: updateCareScheduleDto.end_date,
           user_plant_id: updateCareScheduleDto.user_plant_id,
+          phase_name: updateCareScheduleDto.phase_name,
+          desc: updateCareScheduleDto.desc,
         },
       });
     } catch (error) {
@@ -172,7 +176,9 @@ export class CareScheduleService {
       }
 
       const plantData =
-        await this.userPlantService.getPlantInforToPrompt(user_plant_id);
+        await this.userPlantService.findUserPlantToGenerateSchedule(
+          user_plant_id,
+        );
 
       const schedules =
         await this.geminiService.generateScheduleTakeCarePlant(plantData);
@@ -185,23 +191,25 @@ export class CareScheduleService {
             data: {
               start_date: new Date(schedule.start_date),
               end_date: new Date(schedule.end_date),
+              phase_name: schedule.phase_name,
+              desc: schedule.desc,
               user_plant_id: user_plant_id,
             },
           });
 
-          const tasks = await this.prisma.task.createMany({
-            data: schedule.tasks.map((task) => ({
-              task_date: new Date(task.task_date),
-              task_time: new Date(
-                `${task.task_date}T${task.task_time}:00.000Z`,
-              ),
-              content: task.content,
-              completion_status: TASK_STATUS.NOT_YET,
-              care_schedule_id: careSchedule.id,
-            })),
-          });
+          // const tasks = await this.prisma.task.createMany({
+          //   data: schedule.tasks.map((task) => ({
+          //     task_date: new Date(task.task_date),
+          //     task_time: new Date(
+          //       `${task.task_date}T${task.task_time}:00.000Z`,
+          //     ),
+          //     content: task.content,
+          //     completion_status: TASK_STATUS.NOT_YET,
+          //     care_schedule_id: careSchedule.id,
+          //   })),
+          // });
 
-          createdCareSchedules.push({ careSchedule, tasks });
+          createdCareSchedules.push({ careSchedule });
         } catch (dbError) {
           throw new InternalServerErrorException(
             dbError.message || 'Failed to save schedule to database',

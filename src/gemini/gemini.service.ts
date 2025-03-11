@@ -218,7 +218,7 @@ export class GeminiService {
   ): Promise<CareScheduleDto[]> {
     try {
       const handlePrompt =
-        promptToGenerateSchedule.promptToGenerateCareScheduleVi(
+        promptToGenerateSchedule.promptToGenerateCareScheduleEn(
           getUserPlantData,
         );
       const geminiResult =

@@ -16,6 +16,8 @@ model Care_Schedule {
   start_date    DateTime   @db.Timestamp(6)
   end_date      DateTime   @db.Timestamp(6)
   user_plant_id String     @db.Uuid
+  phase_name    String?    @db.VarChar
+  desc          String?
   User_Plant    User_Plant @relation(fields: [user_plant_id], references: [id], onDelete: Cascade)
   Task          Task[]
 }

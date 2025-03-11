@@ -326,4 +326,164 @@ export class UserPlantService {
       );
     }
   }
+
+  async findUserPlantToGenerateSchedule(id: string) {
+    try {
+      const userPlant = await this.prisma.user_Plant.findUnique({
+        where: { id },
+        select: {
+          growth_stage: true,
+          plant_site: true,
+          planting_date: true,
+          caring_plant_infor: true,
+          Plant: {
+            select: {
+              plant_name: true,
+              scientific_name: true,
+              overview: true,
+              difficulty_level: true,
+              soil_type: true,
+              habitatLocation: true,
+              minTemperature: true,
+              maxTemperature: true,
+              minMatureSize: true,
+              maxMatureSize: true,
+              humidityRange: true,
+              lightRequirement: true,
+              Category: {
+                select: {
+                  category_name: true,
+                },
+              },
+              Phase: {
+                select: {
+                  phase_name: true,
+                  desc: true,
+                  duration: true,
+                  size: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      if (!userPlant) {
+        throw new HttpException(
+          `Plant with ID ${id} not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      const growthStage = await this.prisma.phase.findUnique({
+        where: { id: userPlant.growth_stage },
+        select: { phase_name: true },
+      });
+
+      userPlant.growth_stage = growthStage?.phase_name || null;
+
+      const formattedData = {
+        plant_name: {
+          description: 'Common name of the plant in Vietnam',
+          value: userPlant.Plant?.plant_name || null,
+        },
+        scientific_name: {
+          description: 'Scientific name of the plant',
+          value: userPlant.Plant?.scientific_name || null,
+        },
+        overview: {
+          description: 'Overview of the plant',
+          value: userPlant.Plant?.overview || null,
+        },
+        caring_plant_infor: {
+          description:
+            'Information about the plant currently being cared for by the user',
+          value: userPlant.caring_plant_infor || null,
+        },
+        planting_date: {
+          description: 'The date the user started planting this plant',
+          value: userPlant.planting_date || null,
+        },
+        plant_site: {
+          description:
+            'The location where the user is keeping this plant for care',
+          value: userPlant.plant_site || null,
+        },
+        difficulty_level: {
+          description: 'Difficulty level of plant care',
+          value: userPlant.Plant?.difficulty_level || null,
+        },
+        soil_type: {
+          description: 'Suitable soil type for the plant',
+          value: userPlant.Plant?.soil_type || null,
+        },
+        habitatLocation: {
+          description: 'Ideal location for planting the plant',
+          value: userPlant.Plant?.habitatLocation || null,
+        },
+        minTemperature: {
+          description: 'Minimum temperature the plant can tolerate',
+          value: userPlant.Plant?.minTemperature || null,
+        },
+        maxTemperature: {
+          description: 'Maximum temperature the plant can tolerate',
+          value: userPlant.Plant?.maxTemperature || null,
+        },
+        minMatureSize: {
+          description: 'Minimum mature size of the plant',
+          value: userPlant.Plant?.minMatureSize || null,
+        },
+        maxMatureSize: {
+          description: 'Maximum mature size of the plant',
+          value: userPlant.Plant?.maxMatureSize || null,
+        },
+        humidityRange: {
+          description:
+            'Suitable humidity range for the plant (NONE, VERY_LOW, LOW, MEDIUM, HIGH, VERY_HIGH)',
+          value: userPlant.Plant?.humidityRange || null,
+        },
+        lightRequirement: {
+          description:
+            'Required light level (NONE, VERY_LOW, LOW, MEDIUM, HIGH, VERY_HIGH)',
+          value: userPlant.Plant?.lightRequirement || null,
+        },
+        category: {
+          description: 'Plant category',
+          value: userPlant.Plant?.Category?.category_name || null,
+        },
+        growth_stage: {
+          description: 'Current growth stage of the plant provided by the user',
+          value: userPlant.growth_stage,
+        },
+        phase:
+          userPlant.Plant?.Phase?.map((p) => ({
+            phase_name: {
+              description: 'Development phase name of the plant',
+              value: p.phase_name || null,
+            },
+            desc: {
+              description: 'Description of this development phase',
+              value: p.desc || null,
+            },
+            duration: {
+              description: 'Total hours the plant stays in this phase',
+              value: p.duration || null,
+            },
+            size: {
+              description: 'Average size in this phase',
+              value: p.size || null,
+            },
+          })) || [],
+      };
+
+      return formattedData;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        `Failed to get plant information: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

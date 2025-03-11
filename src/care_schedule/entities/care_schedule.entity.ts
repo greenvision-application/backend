@@ -14,6 +14,12 @@ export class CareScheduleEntity implements Care_Schedule {
   @ApiProperty({ description: 'The start date of the care schedule' })
   start_date: Date;
 
+  @ApiProperty({ description: 'The description of the care schedule' })
+  desc: string;
+
+  @ApiProperty({ description: 'The phase name  of the care schedule' })
+  phase_name: string;
+
   @ApiProperty({ description: 'The end date of the care schedule' })
   end_date: Date;
 

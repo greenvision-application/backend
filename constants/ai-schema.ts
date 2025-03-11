@@ -292,39 +292,49 @@ const careScheduleSchema: ArraySchema = {
         description: 'Start date of the care schedule (YYYY-MM-DD).',
         nullable: false,
       },
+      phase_name: {
+        type: SchemaType.STRING,
+        description: 'Name of the plant growth phase.',
+        nullable: false,
+      },
+      desc: {
+        type: SchemaType.STRING,
+        description: 'A short description of this growth stage.',
+        nullable: false,
+      },
       end_date: {
         type: SchemaType.STRING,
         description: 'End date of the care schedule (YYYY-MM-DD).',
         nullable: false,
       },
-      tasks: {
-        type: SchemaType.ARRAY,
-        description:
-          'List of plant care tasks that need to be performed on the schedule.',
-        items: {
-          type: SchemaType.OBJECT,
-          properties: {
-            task_date: {
-              type: SchemaType.STRING,
-              description: 'Date of the task (YYYY-MM-DD).',
-              nullable: false,
-            },
-            task_time: {
-              type: SchemaType.STRING,
-              description: 'Time to perform the task (HH:MM).',
-              nullable: false,
-            },
-            content: {
-              type: SchemaType.STRING,
-              description: 'Description of the care task.',
-              nullable: false,
-            },
-          },
-          required: ['task_date', 'content', 'task_time'],
-        },
-      },
+      // tasks: {
+      //   type: SchemaType.ARRAY,
+      //   description:
+      //     'List of plant care tasks that need to be performed on the schedule.',
+      //   items: {
+      //     type: SchemaType.OBJECT,
+      //     properties: {
+      //       task_date: {
+      //         type: SchemaType.STRING,
+      //         description: 'Date of the task (YYYY-MM-DD).',
+      //         nullable: false,
+      //       },
+      //       task_time: {
+      //         type: SchemaType.STRING,
+      //         description: 'Time to perform the task (HH:MM).',
+      //         nullable: false,
+      //       },
+      //       content: {
+      //         type: SchemaType.STRING,
+      //         description: 'Description of the care task.',
+      //         nullable: false,
+      //       },
+      //     },
+      //     required: ['task_date', 'content', 'task_time'],
+      //   },
+      // },
     },
-    required: ['start_date', 'end_date', 'tasks'],
+    required: ['start_date', 'end_date', 'phase_name', 'desc'],
   },
 };
 

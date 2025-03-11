@@ -28,6 +28,18 @@ export class CareScheduleDto {
   start_date: string;
 
   @ApiProperty({
+    description: 'Name of the plant growth phase.',
+    example: 'Nở hoa',
+  })
+  phase_name: string;
+
+  @ApiProperty({
+    description: 'Description of the plant growth phase.',
+    example: 'Hoa màu trắng hồng',
+  })
+  desc: string;
+
+  @ApiProperty({
     description: 'End date of the care schedule (YYYY-MM-DD).',
     example: '2024-04-01',
   })
@@ -38,5 +50,5 @@ export class CareScheduleDto {
       'List of plant care tasks that need to be performed on the schedule.',
     type: [CareTaskDto],
   })
-  tasks: CareTaskDto[];
+  tasks?: CareTaskDto[];
 }

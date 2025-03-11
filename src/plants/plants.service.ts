@@ -38,7 +38,6 @@ export class PlantsService {
   }
 
   async findAllForClient(client_id: string) {
-    console.log(client_id);
     try {
       const plants = await this.prisma.plant.findMany({
         where: {

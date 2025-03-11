@@ -60,7 +60,6 @@ export class UserPlantController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   async getTimeline(@Req() req: any) {
-    console.log('inside controller::::', req);
     return this.userPlantService.findSchedulePlant(req.user?.id);
   }
 
@@ -81,6 +80,16 @@ export class UserPlantController {
   })
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return await this.userPlantService.findOne(id);
+  }
+
+  @Post('test-generate-schedule/:id')
+  @ApiOperation({ summary: 'Test generate schedule' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async testGenerateSchedule(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.userPlantService.findUserPlantToGenerateSchedule(id);
   }
 
   @Patch(':id')
