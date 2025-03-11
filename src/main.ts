@@ -32,8 +32,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT ?? 8080);
-  console.log(
-    `Application is running on: (http://localhost:${process.env.PORT})`,
-  );
+  const appUrl = await app.getUrl();
+  console.log(`Application is running on: ${appUrl}`);
 }
 bootstrap();

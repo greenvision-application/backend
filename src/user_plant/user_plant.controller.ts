@@ -149,6 +149,6 @@ export class UserPlantController {
     description: 'Internal server error',
   })
   async getPlantInfoForPrompt(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.userPlantService.getPlantInforToPrompt(id);
+    return await this.userPlantService.findUserPlantToGenerateSchedule(id);
   }
 }

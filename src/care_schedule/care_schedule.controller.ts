@@ -120,4 +120,25 @@ export class CareScheduleController {
   promptSchedule(@Param('id', ParseUUIDPipe) id: string) {
     return this.careScheduleService.generateSchedule(id);
   }
+
+  @Get('care-schedule-info/:id')
+  @ApiOperation({
+    summary: 'Get Care schedule plant information for prompt generation',
+  })
+  @ApiParam({ name: 'id', description: 'Care schedule plant ID (UUID)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Retrieved CareSchedule information successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Care schedule not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
+  async getPlantInfoForPrompt(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.careScheduleService.getScheduleInforToPrompt(id);
+  }
 }

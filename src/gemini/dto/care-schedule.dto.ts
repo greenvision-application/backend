@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-class CareTaskDto {
+export class CareTaskDto {
   @ApiProperty({
     description: 'Date of the task (YYYY-MM-DD).',
     example: '2024-03-10',

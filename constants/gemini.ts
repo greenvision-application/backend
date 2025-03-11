@@ -49,6 +49,15 @@ const scheduleGenerationConfig = {
   responseSchema: aiSchema.careScheduleSchema,
 };
 
+const taskGenerationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 40,
+  maxOutputTokens: 8192,
+  responseMimeType: 'application/json',
+  responseSchema: aiSchema.tasksSchema,
+};
+
 export default {
   BOT_ERROR_MESSAGE,
   GEMINI_MODEL_NAME,
@@ -60,4 +69,5 @@ export default {
   imageAnalysisConfig,
   phaseGenerationConfig,
   scheduleGenerationConfig,
+  taskGenerationConfig,
 };

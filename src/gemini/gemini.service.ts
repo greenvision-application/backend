@@ -16,9 +16,10 @@ import keys from 'constants/keys';
 import promptToScan from 'constants/prompts/to-scan';
 import promptToGeneratePhasePlant from 'constants/prompts/to-generate-phases';
 import promptToGenerateSchedule from 'constants/prompts/to-generate-schedule';
+import promptToGenerateTask from 'constants/prompts/to-generate-task';
 import { PlantResponseDTO } from './dto/ai-scan-plant-response.dto';
 import { PlantGrowthPhaseDTO } from './dto/plant-growth-phase.dto';
-import { CareScheduleDto } from './dto/care-schedule.dto';
+import { CareScheduleDto, CareTaskDto } from './dto/care-schedule.dto';
 
 @Injectable()
 export class GeminiService {
@@ -27,6 +28,7 @@ export class GeminiService {
   private readonly modelImageAnalysis: GenerativeModel;
   private readonly modelPhaseGeneration: GenerativeModel;
   private readonly modelScheduleGeneration: GenerativeModel;
+  private readonly modelTaskGeneration: GenerativeModel;
   private readonly fileManager: GoogleAIFileManager;
   private chatSessions: { [sessionId: string]: ChatSession } = {};
   private readonly logger = new Logger(GeminiService.name);
@@ -52,6 +54,10 @@ export class GeminiService {
     this.modelScheduleGeneration = this.googleAI.getGenerativeModel({
       model: gemini.GEMINI_MODEL_NAME,
       generationConfig: gemini.scheduleGenerationConfig,
+    });
+    this.modelTaskGeneration = this.googleAI.getGenerativeModel({
+      model: gemini.GEMINI_MODEL_NAME,
+      generationConfig: gemini.taskGenerationConfig,
     });
     this.unsplash = createApi({ accessKey: unsplashAccessKey });
   }
@@ -228,6 +234,24 @@ export class GeminiService {
       return processAIResponse;
     } catch (error) {
       this.logger.error('Error generate schedule for plant :', error);
+    }
+  }
+
+  async generateTaskTakeCarePlant(
+    getCareSchedulePlant: any,
+  ): Promise<CareTaskDto[]> {
+    try {
+      const handlePrompt =
+        promptToGenerateTask.promptToGeneratePersonalizedTasksVi(
+          getCareSchedulePlant,
+        );
+      const geminiResult =
+        await this.modelTaskGeneration.generateContent(handlePrompt);
+      const processAIResponse =
+        await this.processAIResponse<CareTaskDto[]>(geminiResult);
+      return processAIResponse;
+    } catch (error) {
+      this.logger.error('Error generate Task for take care plant :', error);
     }
   }
 }

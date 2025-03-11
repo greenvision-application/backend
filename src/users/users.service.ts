@@ -17,6 +17,23 @@ export class UsersService {
     try {
       return await this.prisma.user.findMany({
         where: { is_active: true },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          preferences: true,
+          is_active: true,
+          address: true,
+          password: true,
+          created_at: true,
+          role_id: true,
+          Role: {
+            select: {
+              id: true,
+              role_name: true,
+            },
+          },
+        },
         orderBy: { created_at: 'desc' },
       });
     } catch (error) {
