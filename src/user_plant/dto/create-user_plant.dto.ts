@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 
 export class CreateUserPlantDto
-  implements Omit<Prisma.User_PlantCreateInput, 'id' | 'created_at'>
+  implements Omit<Prisma.User_PlantCreateInput, 'id' | 'created_at' | 'user_id'>
 {
   @ApiProperty({ required: false, example: 'My Lovely Plant' })
   @IsString()
@@ -48,8 +48,8 @@ export class CreateUserPlantDto
     default: PLANT_SITE.OUTDOOR,
     example: PLANT_SITE.OUTDOOR,
   })
-  @IsNotEmpty()
-  plant_site: PLANT_SITE;
+  @IsOptional()
+  plant_site?: PLANT_SITE;
 
   @ApiProperty({
     example: { water: '200ml', fertilizer: '100g', light: '6 hours' },
@@ -63,10 +63,10 @@ export class CreateUserPlantDto
   @IsNotEmpty()
   plant_id: string;
 
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
-  @IsUUID()
-  @IsNotEmpty()
-  user_id: string;
+  // @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
+  // @IsUUID()
+  // @IsNotEmpty()
+  // user_id: string;
 
   @ApiProperty()
   Plant: Prisma.PlantCreateNestedOneWithoutUser_PlantInput;

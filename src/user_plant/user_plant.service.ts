@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class UserPlantService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createUserPlantDto: CreateUserPlantDto) {
+  async create(createUserPlantDto: CreateUserPlantDto, userId: string) {
     try {
       const userPlant = await this.prisma.user_Plant.create({
         data: {
@@ -19,7 +19,7 @@ export class UserPlantService {
           plant_site: createUserPlantDto.plant_site,
           caring_plant_infor: createUserPlantDto.caring_plant_infor,
           plant_id: createUserPlantDto.plant_id,
-          user_id: createUserPlantDto.user_id,
+          user_id: userId,
         },
       });
       return userPlant;
@@ -73,7 +73,11 @@ export class UserPlantService {
     }
   }
 
-  async update(id: string, updateUserPlantDto: UpdateUserPlantDto) {
+  async update(
+    id: string,
+    updateUserPlantDto: UpdateUserPlantDto,
+    userId: string,
+  ) {
     try {
       const userPlant = await this.prisma.user_Plant.update({
         where: { id },
@@ -86,7 +90,7 @@ export class UserPlantService {
           plant_site: updateUserPlantDto.plant_site,
           caring_plant_infor: updateUserPlantDto.caring_plant_infor,
           plant_id: updateUserPlantDto.plant_id,
-          user_id: updateUserPlantDto.user_id,
+          user_id: userId,
         },
       });
       return userPlant;

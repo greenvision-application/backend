@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   UseGuards,
   Req,
+  Request,
 } from '@nestjs/common';
 import { UserPlantService } from './user_plant.service';
 import { CreateUserPlantDto } from './dto/create-user_plant.dto';
@@ -38,8 +39,13 @@ export class UserPlantController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',
   })
-  async create(@Body() createUserPlantDto: CreateUserPlantDto) {
-    return await this.userPlantService.create(createUserPlantDto);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async create(
+    @Request() req: any,
+    @Body() createUserPlantDto: CreateUserPlantDto,
+  ) {
+    return await this.userPlantService.create(createUserPlantDto, req.user?.id);
   }
 
   @Get()
@@ -109,9 +115,14 @@ export class UserPlantController {
   })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
+    @Request() req: any,
     @Body() updateUserPlantDto: UpdateUserPlantDto,
   ) {
-    return await this.userPlantService.update(id, updateUserPlantDto);
+    return await this.userPlantService.update(
+      id,
+      updateUserPlantDto,
+      req.user?.id,
+    );
   }
 
   @Delete(':id')
