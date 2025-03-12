@@ -40,7 +40,8 @@ export class CreateUserPlantDto
   })
   @IsArray()
   @IsString({ each: true })
-  image_url: string[];
+  @IsOptional()
+  image_url?: string[];
 
   @ApiProperty({
     enum: PLANT_SITE,
