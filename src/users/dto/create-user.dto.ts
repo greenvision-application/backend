@@ -38,13 +38,13 @@ export class CreateUserDto
   @IsUUID()
   role_id: string;
 
-  @ApiProperty({ required: false, nullable: true })
+  @ApiProperty({ required: false, nullable: true, default: null })
   @IsOptional()
-  address?: Prisma.InputJsonValue;
+  address?: Prisma.InputJsonValue | null;
 
-  @ApiProperty({ required: false, nullable: true })
+  @ApiProperty({ required: false, nullable: true, default: null })
   @IsOptional()
-  preferences?: Prisma.InputJsonValue;
+  preferences?: Prisma.InputJsonValue | null;
 
   @ApiProperty({ default: true })
   @IsNotEmpty()
