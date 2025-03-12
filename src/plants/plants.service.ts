@@ -74,6 +74,7 @@ export class PlantsService {
       const plant = await this.prisma.plant.findUnique({
         where: { id },
         select: {
+          id: true,
           characteristic: true,
           plant_name: true,
           scientific_name: true,
