@@ -95,6 +95,12 @@ export class PlantsService {
               category_name: true,
             },
           },
+          Phase: {
+            select: {
+              id: true,
+              phase_name: true,
+            },
+          },
         },
       });
 
