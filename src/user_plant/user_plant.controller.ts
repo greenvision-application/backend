@@ -113,6 +113,8 @@ export class UserPlantController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',
   })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Request() req: any,
