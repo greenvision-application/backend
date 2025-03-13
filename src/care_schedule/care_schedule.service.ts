@@ -174,6 +174,16 @@ export class CareScheduleService {
         );
       }
 
+      const existingSchedules = await this.prisma.care_Schedule.findMany({
+        where: {
+          user_plant_id: user_plant_id,
+        },
+      });
+
+      if (existingSchedules && existingSchedules.length > 0) {
+        return existingSchedules.map((careSchedule) => ({ careSchedule }));
+      }
+
       const plantData =
         await this.userPlantService.findUserPlantToGenerateSchedule(
           user_plant_id,
