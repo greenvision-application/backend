@@ -11,6 +11,8 @@ import {
   NotFoundException,
   BadRequestException,
   Patch,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -18,11 +20,13 @@ import {
   ApiOperation,
   ApiCreatedResponse,
   ApiResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity/user.entity';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 
 @Controller('users')
 @ApiTags('Users')
@@ -54,9 +58,11 @@ export class UsersController {
     status: HttpStatus.NOT_FOUND,
     description: 'User not found',
   })
-  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async findOne(@Req() req: any) {
     try {
-      return await this.usersService.findOne(id);
+      return await this.usersService.findOne(req.user?.id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
