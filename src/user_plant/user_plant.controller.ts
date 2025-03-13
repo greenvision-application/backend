@@ -11,6 +11,7 @@ import {
   UseGuards,
   Req,
   Request,
+  Put,
 } from '@nestjs/common';
 import { UserPlantService } from './user_plant.service';
 import { CreateUserPlantDto } from './dto/create-user_plant.dto';
@@ -152,6 +153,15 @@ export class UserPlantController {
     );
   }
 
+  @Put('like/:id')
+  @ApiOperation({ summary: 'Update a favorite status' })
+  @ApiParam({ name: 'id', description: 'User plant ID (UUID)' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async toggleLike(@Param('id') id: string) {
+    return this.userPlantService.like(id);
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a user plant' })
   @ApiParam({ name: 'id', description: 'User plant ID (UUID)' })
@@ -167,6 +177,8 @@ export class UserPlantController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Internal server error',
   })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     return await this.userPlantService.remove(id);
   }

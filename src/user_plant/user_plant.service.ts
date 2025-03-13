@@ -395,4 +395,34 @@ export class UserPlantService {
       );
     }
   }
+
+  async like(id: string) {
+    try {
+      const currentPlant = await this.prisma.user_Plant.findUnique({
+        where: { id },
+        select: { favorite: true },
+      });
+
+      if (!currentPlant) {
+        throw new HttpException('User plant not found', HttpStatus.NOT_FOUND);
+      }
+
+      await this.prisma.user_Plant.update({
+        where: { id },
+        data: {
+          favorite: !currentPlant.favorite,
+        },
+      });
+
+      return { message: 'Favorite status updated successfully' };
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new HttpException('User plant not found', HttpStatus.NOT_FOUND);
+      }
+      throw new HttpException(
+        error.message || 'Failed to delete user plant',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
