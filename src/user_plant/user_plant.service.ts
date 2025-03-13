@@ -318,6 +318,7 @@ export class UserPlantService {
           favorite: true,
         },
         select: {
+          id: true,
           nickname: true,
           Plant: {
             select: {
@@ -346,6 +347,7 @@ export class UserPlantService {
           },
         },
         select: {
+          id: true,
           nickname: true,
           Plant: {
             select: {
@@ -372,6 +374,7 @@ export class UserPlantService {
           growth_stage: null,
         },
         select: {
+          id: true,
           nickname: true,
           Plant: {
             select: {
