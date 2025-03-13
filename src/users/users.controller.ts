@@ -48,7 +48,7 @@ export class UsersController {
     }
   }
 
-  @Get()
+  @Get('detail')
   @ApiOperation({ summary: 'Get user by id' })
   @ApiOkResponse({
     description: 'User retrieved successfully',
