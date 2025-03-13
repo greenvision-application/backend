@@ -6,6 +6,7 @@ import { GeminiModule } from '@/gemini/gemini.module';
 import { GeminiService } from '@/gemini/gemini.service';
 import { PhaseService } from '@/phase/phase.service';
 import { CareInstructionService } from '@/care_instruction/care_instruction.service';
+import { PlantRecommendationService } from './plant-recommendation.service';
 
 @Module({
   controllers: [PlantsController],
@@ -14,6 +15,7 @@ import { CareInstructionService } from '@/care_instruction/care_instruction.serv
     GeminiService,
     PhaseService,
     CareInstructionService,
+    PlantRecommendationService,
   ],
   imports: [PrismaModule, GeminiModule],
 })

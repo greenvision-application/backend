@@ -27,11 +27,15 @@ import { PlantEntity } from './entities/plant.entity';
 import { UrlImagePlantDto } from './dto/url-image-plant.dto';
 import { GeneratePhaseDto } from './dto/generate-phase.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
+import { PlantRecommendationService } from './plant-recommendation.service';
 
 @Controller('plants')
 @ApiTags('Plants')
 export class PlantsController {
-  constructor(private readonly plantsService: PlantsService) {}
+  constructor(
+    private readonly plantsService: PlantsService,
+    private readonly plantRecommendation: PlantRecommendationService,
+  ) {}
 
   @Post()
   create(@Body() createPlantDto: CreatePlantDto) {
@@ -75,6 +79,16 @@ export class PlantsController {
   @ApiBearerAuth('access-token')
   async getAllPlants(@Req() req: any) {
     return this.plantsService.findAllForClient(req.user?.id);
+  }
+
+  @Get('recommendations')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get 6 recommendations' })
+  async getRecommendedPlants(@Req() req: any) {
+    const recommendations =
+      await this.plantRecommendation.recommendSimilarPlants(req.user?.id);
+    return recommendations;
   }
 
   @Get(':id')
