@@ -62,9 +62,34 @@ export class UserPlantController {
     return await this.userPlantService.findAll();
   }
 
+  @Get('favorite')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get favorite plants' })
+  async getFavoritePlants(@Req() req: any) {
+    return this.userPlantService.findFavoritePlants(req.user?.id);
+  }
+
+  @Get('planted')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get planted plants' })
+  async getPlantedPlants(@Req() req: any) {
+    return this.userPlantService.findPlantedPlants(req.user?.id);
+  }
+
+  @Get('unplanted')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get unplanted plants' })
+  async getUnplantedPlants(@Req() req: any) {
+    return this.userPlantService.findUnplantedPlants(req.user?.id);
+  }
+
   @Get('client-schedule')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get plant care schedule' })
   async getTimeline(@Req() req: any) {
     return this.userPlantService.findSchedulePlant(req.user?.id);
   }

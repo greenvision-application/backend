@@ -309,4 +309,84 @@ export class UserPlantService {
       );
     }
   }
+
+  async findFavoritePlants(userId: string) {
+    try {
+      const favoritePlants = await this.prisma.user_Plant.findMany({
+        where: {
+          user_id: userId,
+          favorite: true,
+        },
+        select: {
+          nickname: true,
+          Plant: {
+            select: {
+              image_url: true,
+              plant_name: true,
+            },
+          },
+        },
+      });
+      return favoritePlants;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to fetch favorite plants',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findPlantedPlants(userId: string) {
+    try {
+      const plantedPlants = await this.prisma.user_Plant.findMany({
+        where: {
+          user_id: userId,
+          growth_stage: {
+            not: null,
+          },
+        },
+        select: {
+          nickname: true,
+          Plant: {
+            select: {
+              image_url: true,
+              plant_name: true,
+            },
+          },
+        },
+      });
+      return plantedPlants;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to fetch planted plants',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findUnplantedPlants(userId: string) {
+    try {
+      const unplantedPlants = await this.prisma.user_Plant.findMany({
+        where: {
+          user_id: userId,
+          growth_stage: null,
+        },
+        select: {
+          nickname: true,
+          Plant: {
+            select: {
+              image_url: true,
+              plant_name: true,
+            },
+          },
+        },
+      });
+      return unplantedPlants;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to fetch unplanted plants',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
