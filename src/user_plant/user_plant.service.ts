@@ -322,6 +322,7 @@ export class UserPlantService {
           nickname: true,
           Plant: {
             select: {
+              id: true,
               image_url: true,
               plant_name: true,
             },
@@ -351,6 +352,7 @@ export class UserPlantService {
           nickname: true,
           Plant: {
             select: {
+              id: true,
               image_url: true,
               plant_name: true,
             },
@@ -378,6 +380,7 @@ export class UserPlantService {
           nickname: true,
           Plant: {
             select: {
+              id: true,
               image_url: true,
               plant_name: true,
             },
