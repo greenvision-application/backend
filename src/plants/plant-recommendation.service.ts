@@ -108,7 +108,6 @@ export class PlantRecommendationService {
         id: {
           notIn: existingPlantIds,
         },
-        // Thêm điều kiện approved_content nếu cần thiết
         approved_content: true,
       },
       include: {
@@ -170,7 +169,11 @@ export class PlantRecommendationService {
       return [];
     }
 
-    return recommendations;
+    return recommendations.map(({ id, image_url, plant_name }) => ({
+      id,
+      image_url,
+      plant_name,
+    }));
   }
 }
 
