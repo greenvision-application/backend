@@ -4,6 +4,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from '@/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -137,7 +138,7 @@ export class UsersService {
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const { username, email, role_id } = createUserDto;
+      const { username, email, role_id, password } = createUserDto;
 
       if (!email) {
         throw new BadRequestException('Email is required');
@@ -165,8 +166,10 @@ export class UsersService {
         }
       }
 
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       const newUser = await this.prisma.user.create({
-        data: createUserDto,
+        data: { ...createUserDto, password: hashedPassword },
       });
       return newUser;
     } catch (error) {
