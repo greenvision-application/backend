@@ -101,8 +101,8 @@ export class CreatePlantDto
 
   @ApiProperty()
   @IsUUID()
-  @IsNotEmpty()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @IsOptional()
   category_id: string;
 
   @ApiProperty({ default: PLANT_SITE.OUTDOOR })

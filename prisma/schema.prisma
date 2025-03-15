@@ -86,7 +86,7 @@ model Plant {
   image_url        String[]
   difficulty_level DIFFICULTY_LEVEL @default(MEDIUM)
   soil_type        SOIL_TYPE
-  category_id      String           @db.Uuid
+  category_id      String?          @db.Uuid
   habitatLocation  PLANT_SITE       @default(OUTDOOR)
   minTemperature   Float            @db.Real
   maxTemperature   Float            @db.Real
@@ -96,7 +96,7 @@ model Plant {
   lightRequirement LEVEL            @default(MEDIUM)
   approved_content Boolean          @default(false)
   Phase            Phase[]
-  Category         Category         @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  Category         Category?        @relation(fields: [category_id], references: [id], onDelete: Cascade)
   User_Plant       User_Plant[]
 }
 
