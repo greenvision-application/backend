@@ -127,6 +127,9 @@ export class UserPlantService {
       const userPlants = await this.prisma.user_Plant.findMany({
         where: {
           user_id: client_id,
+          growth_stage: {
+            not: null,
+          },
         },
         select: {
           id: true,
