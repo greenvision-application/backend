@@ -91,6 +91,7 @@ export class PlantsService {
           maxTemperature: true,
           humidityRange: true,
           lightRequirement: true,
+          approved_content: true,
           Category: {
             select: {
               category_name: true,
