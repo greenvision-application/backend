@@ -160,7 +160,7 @@ export class PlantsController {
     }
   }
 
-  @Post('generate-phase')
+  @Post('generate-phase/:id')
   @ApiOperation({ summary: 'Generate phase of plant' })
   @ApiOkResponse({
     description: 'Phase of plant generated successfully',
@@ -169,11 +169,15 @@ export class PlantsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to generate phase of plant',
   })
-  async generatePhase(@Body() generatePhaseDto: GeneratePhaseDto) {
+  async generatePhase(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() generatePhaseDto: GeneratePhaseDto,
+  ) {
     try {
-      return await this.plantsService.generatePhasePlant(
+      return await this.plantsService.createPlantPhaseWithAI(
         generatePhaseDto.plant_name,
         generatePhaseDto.scientific_name,
+        id,
       );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
