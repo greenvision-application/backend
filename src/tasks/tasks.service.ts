@@ -142,7 +142,7 @@ export class TasksService {
           task_date: new Date(task.task_date),
           task_time: new Date(`${task.task_date}T${task.task_time}:00.000Z`),
           content: task.content,
-          completion_status: TASK_STATUS.NOT_YET,
+          completion_status: TASK_STATUS.DO,
           care_schedule_id,
         })),
       });
