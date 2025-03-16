@@ -5,12 +5,15 @@ import {
   InternalServerErrorException,
   HttpException,
   HttpStatus,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 import { CreateCareScheduleDto } from './dto/create-care_schedule.dto';
 import { UpdateCareScheduleDto } from './dto/update-care_schedule.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { GeminiService } from '@/gemini/gemini.service';
 import { UserPlantService } from '@/user_plant/user_plant.service';
+import { TasksService } from '@/tasks/tasks.service';
 
 @Injectable()
 export class CareScheduleService {
@@ -18,6 +21,7 @@ export class CareScheduleService {
     private prisma: PrismaService,
     private geminiService: GeminiService,
     private userPlantService: UserPlantService,
+    @Inject(forwardRef(() => TasksService)) private taskService: TasksService,
   ) {}
 
   async create(createCareScheduleDto: CreateCareScheduleDto) {
@@ -213,6 +217,12 @@ export class CareScheduleService {
           );
         }
       }
+
+      setTimeout(() => {
+        createdCareSchedules.forEach(({ careSchedule }) => {
+          this.taskService.generateTask(careSchedule.id);
+        });
+      }, 0);
 
       return createdCareSchedules;
     } catch (error) {

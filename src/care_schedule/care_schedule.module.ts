@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CareScheduleService } from './care_schedule.service';
 import { CareScheduleController } from './care_schedule.controller';
 import { PrismaService } from '@/prisma/prisma.service';
 import { GeminiService } from '@/gemini/gemini.service';
 import { UserPlantService } from '@/user_plant/user_plant.service';
+import { TasksModule } from '@/tasks/tasks.module';
 
 @Module({
   controllers: [CareScheduleController],
@@ -13,5 +14,6 @@ import { UserPlantService } from '@/user_plant/user_plant.service';
     GeminiService,
     UserPlantService,
   ],
+  imports: [forwardRef(() => TasksModule)],
 })
 export class CareScheduleModule {}
