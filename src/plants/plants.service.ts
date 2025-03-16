@@ -23,6 +23,32 @@ export class PlantsService {
         where: {
           approved_content: true,
         },
+        select: {
+          id: true,
+          plant_name: true,
+          scientific_name: true,
+          overview: true,
+          characteristic: true,
+          function: true,
+          meaning: true,
+          image_url: true,
+          difficulty_level: true,
+          soil_type: true,
+          category_id: true,
+          habitatLocation: true,
+          minTemperature: true,
+          maxTemperature: true,
+          minMatureSize: true,
+          maxMatureSize: true,
+          humidityRange: true,
+          lightRequirement: true,
+          approved_content: true,
+          Category: {
+            select: {
+              category_name: true,
+            },
+          },
+        },
         orderBy: { created_at: 'desc' },
       });
       if (!plants || plants.length === 0) {

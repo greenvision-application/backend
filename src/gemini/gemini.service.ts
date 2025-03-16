@@ -40,23 +40,23 @@ export class GeminiService {
     this.googleAI = new GoogleGenerativeAI(geminiApiKey);
     this.fileManager = new GoogleAIFileManager(geminiApiKey);
     this.modelGeneral = this.googleAI.getGenerativeModel({
-      model: gemini.GEMINI_MODEL_NAME,
+      model: gemini.GEMINI_MODEL_NAME_V1,
       generationConfig: gemini.generalConfig,
     });
     this.modelImageAnalysis = this.googleAI.getGenerativeModel({
-      model: gemini.GEMINI_MODEL_NAME,
+      model: gemini.GEMINI_MODEL_NAME_V1,
       generationConfig: gemini.imageAnalysisConfig,
     });
     this.modelPhaseGeneration = this.googleAI.getGenerativeModel({
-      model: gemini.GEMINI_MODEL_NAME,
+      model: gemini.GEMINI_MODEL_NAME_V2,
       generationConfig: gemini.phaseGenerationConfig,
     });
     this.modelScheduleGeneration = this.googleAI.getGenerativeModel({
-      model: gemini.GEMINI_MODEL_NAME,
+      model: gemini.GEMINI_MODEL_NAME_V3,
       generationConfig: gemini.scheduleGenerationConfig,
     });
     this.modelTaskGeneration = this.googleAI.getGenerativeModel({
-      model: gemini.GEMINI_MODEL_NAME,
+      model: gemini.GEMINI_MODEL_NAME_V3,
       generationConfig: gemini.taskGenerationConfig,
     });
     this.unsplash = createApi({ accessKey: unsplashAccessKey });

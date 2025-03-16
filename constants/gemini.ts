@@ -1,7 +1,10 @@
 import aiSchema from './ai-schema';
 
 const BOT_ERROR_MESSAGE = 'Something went wrong !!';
-const GEMINI_MODEL_NAME = 'gemini-2.0-pro-exp-02-05';
+const GEMINI_MODEL_NAME_V1 = 'gemini-2.0-pro-exp-02-05';
+const GEMINI_MODEL_NAME_V2 = 'gemini-2.0-flash-exp';
+const GEMINI_MODEL_NAME_V3 = 'gemini-2.0-flash-thinking-exp-01-21';
+const GEMINI_MODEL_NAME_V4 = 'gemini-2.0-flash-exp-image-generation';
 const CACHE_TTL_SECONDS = 300;
 const CACHE_DISPLAY_NAME = 'chat-conversation-cache';
 const SYSTEM_INSTRUCTION = '';
@@ -60,7 +63,10 @@ const taskGenerationConfig = {
 
 export default {
   BOT_ERROR_MESSAGE,
-  GEMINI_MODEL_NAME,
+  GEMINI_MODEL_NAME_V1,
+  GEMINI_MODEL_NAME_V2,
+  GEMINI_MODEL_NAME_V3,
+  GEMINI_MODEL_NAME_V4,
   CACHE_DISPLAY_NAME,
   SYSTEM_INSTRUCTION,
   CACHE_TTL_SECONDS,
