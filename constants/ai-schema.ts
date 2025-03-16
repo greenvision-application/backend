@@ -143,7 +143,7 @@ const plantGrowthPhasesSchema: ArraySchema = {
       duration: {
         type: SchemaType.NUMBER,
         description:
-          'Total duration (hours) the plant spends in this growth phase.',
+          'Total duration (hours) the plant spends in this growth phase, with a minimum of 24 hours',
         nullable: false,
       },
       care_instruction: {

@@ -9,7 +9,7 @@ Bạn cần trả về một mảng JSON chứa các giai đoạn phát triển 
 - "phase_name": Tên giai đoạn phát triển của cây.
 - "desc": Mô tả về giai đoạn phát triển này.
 - "size": Kích thước trung bình của cây trong giai đoạn này (cm).
-- "duration": Tổng số giờ cây ở trong giai đoạn này(giờ này được quy đổi từ ngày/tuần/tháng).
+- "duration": Tổng số giờ cây ở trong giai đoạn này, ít nhất là 24 giờ(giờ này được quy đổi từ ngày/tuần/tháng).
 - "care_instruction":
   - "water":
     - "frequency": Số lần tưới nước và đơn vị thời gian (ngày, tuần, tháng).
@@ -47,7 +47,7 @@ You need to return a JSON array containing the plant's growth stages with the fo
 - "phase_name": The name of the plant's growth stage.
 - "desc": A description of this growth stage.
 - "size": The average size of the plant during this stage (cm).
-- "duration": The total time the plant stays in this stage (converted into hours from days/weeks/months).
+- "duration": The total time the plant stays in this stage, with a minimum of 24 hours (converted into hours from days/weeks/months).
 - "care_instruction":
   - "water":
     - "frequency": The number of times the plant should be watered and the time unit (days, weeks, months).

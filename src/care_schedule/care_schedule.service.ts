@@ -217,15 +217,19 @@ export class CareScheduleService {
           );
         }
       }
-
       setTimeout(() => {
-        createdCareSchedules.forEach(({ careSchedule }) => {
-          this.taskService.generateTask(careSchedule.id);
-        });
+        try {
+          createdCareSchedules.forEach(({ careSchedule }) => {
+            this.taskService.generateTask(careSchedule.id);
+          });
+        } catch (err) {
+          throw err;
+        }
       }, 0);
 
       return createdCareSchedules;
     } catch (error) {
+      console.error('Error in generateSchedule:', error);
       if (
         error instanceof NotFoundException ||
         error instanceof BadRequestException
