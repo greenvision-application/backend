@@ -52,7 +52,7 @@ export class GeminiService {
       generationConfig: gemini.phaseGenerationConfig,
     });
     this.modelScheduleGeneration = this.googleAI.getGenerativeModel({
-      model: gemini.GEMINI_MODEL_NAME_V3,
+      model: gemini.GEMINI_MODEL_NAME_V2,
       generationConfig: gemini.scheduleGenerationConfig,
     });
     this.modelTaskGeneration = this.googleAI.getGenerativeModel({
