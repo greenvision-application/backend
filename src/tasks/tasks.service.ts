@@ -83,9 +83,6 @@ export class TasksService {
       const task = await this.prisma.task.update({
         where: { id },
         data: updateTaskDto,
-        include: {
-          Care_Schedule: true,
-        },
       });
 
       return task;
