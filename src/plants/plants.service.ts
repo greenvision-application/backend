@@ -20,9 +20,6 @@ export class PlantsService {
   async findAll() {
     try {
       const plants = await this.prisma.plant.findMany({
-        where: {
-          approved_content: true,
-        },
         select: {
           id: true,
           plant_name: true,
