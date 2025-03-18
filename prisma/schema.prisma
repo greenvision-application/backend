@@ -134,6 +134,7 @@ model User {
   is_active    Boolean        @default(true)
   address      Json?
   password     String?        @db.VarChar
+  pushToken    String?        @db.VarChar
   Notification Notification[]
   Role         Role           @relation(fields: [role_id], references: [id], onDelete: Cascade)
   User_Plant   User_Plant[]
@@ -182,6 +183,7 @@ enum NOTIFICATION_STATUS {
   PENDING
   SENT
   READ
+  FAILED
 }
 
 enum PLANT_SITE {

@@ -14,7 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<User[]> {
+  async findAll() {
     try {
       return await this.prisma.user.findMany({
         where: { is_active: true },
@@ -177,6 +177,34 @@ export class UsersService {
         throw error;
       }
       throw new InternalServerErrorException('Failed to create user');
+    }
+  }
+
+  /**
+   * Cập nhật pushToken của user
+   */
+  async updatePushToken(id: string, updatePushToken: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
+
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+
+      return await this.prisma.user.update({
+        where: { id },
+        data: { pushToken: updatePushToken },
+      });
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to update PushToken');
     }
   }
 }

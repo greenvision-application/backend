@@ -136,4 +136,36 @@ export class UsersController {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  @Patch('update-push-token')
+  @ApiOperation({ summary: 'Update PushToken by id' })
+  @ApiOkResponse({
+    description: 'User updated successfully',
+    type: UserEntity,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async updatePushToken(
+    @Req() req: any,
+    @Body('updatePushToken') updatePushToken: string,
+  ) {
+    try {
+      return await this.usersService.updatePushToken(
+        req.user?.id,
+        updatePushToken,
+      );
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

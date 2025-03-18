@@ -22,6 +22,8 @@ export class UserEntity implements User {
 
   @ApiProperty({ nullable: true })
   address: any;
+  @ApiProperty({ nullable: true })
+  pushToken: string;
 
   @ApiProperty({ nullable: true })
   preferences: any;

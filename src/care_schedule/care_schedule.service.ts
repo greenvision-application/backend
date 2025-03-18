@@ -217,15 +217,15 @@ export class CareScheduleService {
           );
         }
       }
-      setTimeout(() => {
-        try {
-          createdCareSchedules.forEach(({ careSchedule }) => {
-            this.taskService.generateTask(careSchedule.id);
-          });
-        } catch (err) {
-          throw err;
-        }
-      }, 0);
+      // setTimeout(() => {
+      //   try {
+      //     createdCareSchedules.forEach(({ careSchedule }) => {
+      //       this.taskService.generateTask(careSchedule.id);
+      //     });
+      //   } catch (err) {
+      //     throw err;
+      //   }
+      // }, 0);
 
       return createdCareSchedules;
     } catch (error) {

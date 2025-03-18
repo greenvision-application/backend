@@ -54,4 +54,9 @@ export class CreateUserDto
   @IsOptional()
   @IsString()
   password?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  pushToken?: string;
 }
