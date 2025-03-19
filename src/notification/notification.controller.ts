@@ -8,11 +8,19 @@ import {
   Delete,
   HttpStatus,
   ParseUUIDPipe,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 
 @ApiTags('Notifications')
 @Controller('notification')
@@ -41,6 +49,22 @@ export class NotificationController {
   })
   findAll() {
     return this.notificationService.findAll();
+  }
+
+  @Get('client')
+  @ApiOperation({ summary: 'Get a notification by user id' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Return the notification.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Notification not found.',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  getNotificationForClient(@Req() req: any) {
+    return this.notificationService.findAllByUserId(req.user?.id);
   }
 
   @Get(':id')

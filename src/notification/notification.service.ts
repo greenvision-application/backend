@@ -30,6 +30,19 @@ export class NotificationService {
     }
   }
 
+  async findAllByUserId(userId: string) {
+    try {
+      return await this.prisma.notification.findMany({
+        where: { user_id: userId },
+        orderBy: [{ send_time: 'desc' }, { created_at: 'desc' }],
+      });
+    } catch (error) {
+      throw new Error(
+        error.message || 'Failed to fetch notifications for user',
+      );
+    }
+  }
+
   async findOne(id: string) {
     try {
       const notification = await this.prisma.notification.findUnique({
