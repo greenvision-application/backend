@@ -16,6 +16,7 @@ import { UserPlantModule } from './user_plant/user_plant.module';
 import { CareScheduleModule } from './care_schedule/care_schedule.module';
 import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './email/email.module';
+import { NotificationModule } from './notification/notification.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
@@ -33,6 +34,7 @@ import { EmailModule } from './email/email.module';
     CareScheduleModule,
     AuthModule,
     EmailModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
