@@ -34,6 +34,27 @@ export class NotificationService {
     try {
       return await this.prisma.notification.findMany({
         where: { user_id: userId },
+        select: {
+          content: true,
+          id: true,
+          send_time: true,
+          created_at: true,
+          status: true,
+          schedule_id: true,
+          Care_Schedule: {
+            select: {
+              User_Plant: {
+                select: {
+                  Plant: {
+                    select: {
+                      image_url: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         orderBy: [{ send_time: 'desc' }, { created_at: 'desc' }],
       });
     } catch (error) {

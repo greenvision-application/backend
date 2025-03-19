@@ -7,4 +7,5 @@ export class NotificationEntity implements Notification {
   send_time: Date;
   status: NOTIFICATION_STATUS;
   user_id: string;
+  schedule_id: string;
 }
