@@ -114,6 +114,12 @@ export class UserPlantController {
     return await this.userPlantService.findOne(id);
   }
 
+  @Get('check-exist-plant/:id')
+  @ApiOperation({ summary: 'Check exist plant' })
+  async checkExistPlant(@Param('id', ParseUUIDPipe) id: string) {
+    return this.userPlantService.checkPlantExists(id);
+  }
+
   @Post('test-generate-schedule/:id')
   @ApiOperation({ summary: 'Test generate schedule' })
   @ApiResponse({

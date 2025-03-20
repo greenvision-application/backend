@@ -7,6 +7,38 @@ import { PrismaService } from '../prisma/prisma.service';
 export class UserPlantService {
   constructor(private prisma: PrismaService) {}
 
+  async checkPlantExists(plantId: string) {
+    try {
+      const userPlant = await this.prisma.user_Plant.findFirst({
+        where: {
+          plant_id: plantId,
+          favorite: true,
+        },
+        select: {
+          id: true,
+          plant_id: true,
+        },
+      });
+
+      if (userPlant) {
+        return {
+          exists: true,
+          userPlant,
+        };
+      }
+
+      return {
+        exists: false,
+        userPlant: null,
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to check plant existence',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async create(createUserPlantDto: CreateUserPlantDto, userId: string) {
     try {
       const userPlant = await this.prisma.user_Plant.create({
