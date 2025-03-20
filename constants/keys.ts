@@ -9,6 +9,7 @@ const emailPort = 'EMAIL_PORT';
 const emailUser = 'EMAIL_USER';
 const emailPassword = 'EMAIL_PASSWORD';
 const secretJwt = 'SECRET_JWT';
+const expoAccessToken = 'EXPO_ACCESS_TOKEN';
 
 export default {
   geminiKey,
@@ -21,4 +22,5 @@ export default {
   emailPort,
   emailUser,
   secretJwt,
+  expoAccessToken,
 };

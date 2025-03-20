@@ -3,12 +3,19 @@ import * as cron from 'node-cron';
 import { PrismaService } from '../prisma/prisma.service';
 import { Expo, ExpoPushMessage } from 'expo-server-sdk';
 import { NOTIFICATION_STATUS, TASK_STATUS } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
+import keys from 'constants/keys';
 
 @Injectable()
 export class TaskNotificationService {
-  private expo = new Expo();
+  private readonly expo: Expo;
 
-  constructor(private prisma: PrismaService) {
+  constructor(
+    private prisma: PrismaService,
+    configService: ConfigService,
+  ) {
+    const expoKey = configService.get(keys.expoAccessToken);
+    this.expo = new Expo({ accessToken: expoKey });
     // Khởi tạo các scheduled jobs
     this.scheduleTaskNotifications();
   }
