@@ -20,3 +20,8 @@ export class GetAIScanResultDTO {
   @IsOptional()
   sessionId: string;
 }
+
+export class PlantHealthReportDto {
+  @IsString()
+  health_report: string;
+}

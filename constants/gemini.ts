@@ -60,6 +60,15 @@ const taskGenerationConfig = {
   responseSchema: aiSchema.tasksSchema,
 };
 
+const checkHealthGenerationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 40,
+  maxOutputTokens: 8192,
+  responseMimeType: 'application/json',
+  responseSchema: aiSchema.plantHealthReportSchema,
+};
+
 export default {
   BOT_ERROR_MESSAGE,
   GEMINI_MODEL_NAME_V1,
@@ -74,4 +83,5 @@ export default {
   phaseGenerationConfig,
   scheduleGenerationConfig,
   taskGenerationConfig,
+  checkHealthGenerationConfig,
 };

@@ -67,4 +67,32 @@ export class GeminiController {
       uploadResult.mimeType,
     );
   }
+
+  @ApiOperation({ summary: 'Upload an image and get AI plant health' })
+  @ApiResponse({ status: 200, description: 'Return AI generated plant health' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Image file to upload',
+    type: 'multipart/form-data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @Post('check-health')
+  @UseInterceptors(FileInterceptor('file'))
+  async checkPlantHealth(@UploadedFile() file: Express.Multer.File) {
+    const uploadResult =
+      await this.uploadFileService.handleFileUploadToGoogle(file);
+    return this.geminiService.generateCheckPlantHealth(
+      uploadResult.fileUri,
+      uploadResult.mimeType,
+    );
+  }
 }

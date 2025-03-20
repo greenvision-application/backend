@@ -339,9 +339,25 @@ const tasksSchema: ArraySchema = {
   },
 };
 
+const plantHealthReportSchema: ObjectSchema = {
+  description:
+    'Schema for generating a detailed health report of a plant based on an image, providing insights into its condition, potential issues, and care recommendations.',
+  type: SchemaType.OBJECT,
+  properties: {
+    health_report: {
+      type: SchemaType.STRING,
+      description:
+        'A comprehensive text report (60 - 100 words) detailing the plant’s health status, detected symptoms, possible causes, and recommendations for care and treatment.',
+      nullable: false,
+    },
+  },
+  required: ['health_report'],
+};
+
 export default {
   scanImagePlantSchema,
   plantGrowthPhasesSchema,
   careScheduleSchema,
   tasksSchema,
+  plantHealthReportSchema,
 };

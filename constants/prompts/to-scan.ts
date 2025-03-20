@@ -42,4 +42,22 @@ The output data must ensure correct JSON format according to the defined schema.
 Note: The results must be returned in Vietnamese, except for the scientific_name field which should remain in Latin.
 `;
 
-export default { promptToScanVi, promptToScanEn };
+const promptToScanHealthEn = `You are an AI assistant specializing in plant health diagnosis. Your task is to analyze an uploaded plant image and generate a detailed health report (60-100 words).  
+
+The report should include:  
+- **Health Status:** General condition of the plant.  
+- **Detected Symptoms:** Observable signs of potential health issues (e.g., yellowing leaves, wilting, brown spots,...).  
+- **Possible Causes:** Likely reasons behind the detected symptoms (e.g., nutrient deficiencies, fungal infections, pest infestations, overwatering,...).  
+- **Affected Parts:** The parts of the plant showing symptoms (e.g., leaves, stems, roots, flowers,...).  
+- **Recommended Actions:** Effective solutions to restore plant health (e.g., changing watering schedule, applying fertilizers, using pesticides).  
+- **Preventive Measures:** Best practices to avoid future issues (e.g., proper soil care, adequate sunlight exposure, pest control strategies).  
+
+The report must be structured in coherent and maintain a word length between **60-100 words**. 
+If the plant appears **healthy**, provide general care tips instead. Ensure that the report is **scientifically accurate, informative, and written in a clear and natural tone**.
+Note: The results must be returned in Vietnamese.
+`;
+export default {
+  promptToScanVi,
+  promptToScanEn,
+  promptToScanHealthEn,
+};

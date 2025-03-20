@@ -10,7 +10,10 @@ import { ConfigService } from '@nestjs/config';
 import { v4 } from 'uuid';
 import { createApi } from 'unsplash-js';
 import { GetAIMessageDTO } from './dto/get-ai-response.dto';
-import { GetAIScanResultDTO } from './dto/get-scan-result.dto';
+import {
+  GetAIScanResultDTO,
+  PlantHealthReportDto,
+} from './dto/get-scan-result.dto';
 import gemini from 'constants/gemini';
 import keys from 'constants/keys';
 import promptToScan from 'constants/prompts/to-scan';
@@ -29,6 +32,7 @@ export class GeminiService {
   private readonly modelPhaseGeneration: GenerativeModel;
   private readonly modelScheduleGeneration: GenerativeModel;
   private readonly modelTaskGeneration: GenerativeModel;
+  private readonly modelHealthGeneration: GenerativeModel;
   private readonly fileManager: GoogleAIFileManager;
   private chatSessions: { [sessionId: string]: ChatSession } = {};
   private readonly logger = new Logger(GeminiService.name);
@@ -58,6 +62,10 @@ export class GeminiService {
     this.modelTaskGeneration = this.googleAI.getGenerativeModel({
       model: gemini.GEMINI_MODEL_NAME_V3,
       generationConfig: gemini.taskGenerationConfig,
+    });
+    this.modelHealthGeneration = this.googleAI.getGenerativeModel({
+      model: gemini.GEMINI_MODEL_NAME_V1,
+      generationConfig: gemini.checkHealthGenerationConfig,
     });
     this.unsplash = createApi({ accessKey: unsplashAccessKey });
   }
@@ -252,6 +260,31 @@ export class GeminiService {
       return processAIResponse;
     } catch (error) {
       this.logger.error('Error generate Task for take care plant :', error);
+    }
+  }
+
+  async generateCheckPlantHealth(
+    fileUri: string,
+    mimeType: string,
+  ): Promise<PlantHealthReportDto> {
+    try {
+      const result = await this.modelHealthGeneration.generateContent([
+        {
+          fileData: {
+            fileUri,
+            mimeType: mimeType,
+          },
+        },
+        promptToScan.promptToScanHealthEn,
+      ]);
+
+      const processedResult =
+        await this.processAIResponse<PlantHealthReportDto>(result);
+
+      return processedResult;
+    } catch (error) {
+      this.logger.error('Error analyzing health uploaded image:', error);
+      throw new Error('Failed to analyze plant health image');
     }
   }
 }
