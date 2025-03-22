@@ -207,4 +207,49 @@ export class UsersService {
       throw new InternalServerErrorException('Failed to update PushToken');
     }
   }
+
+  async updateClientInformation(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
+
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+
+      const { username, email } = updateUserDto;
+
+      if (username) {
+        const existingUserByUsername = await this.prisma.user.findUnique({
+          where: { username },
+        });
+        if (existingUserByUsername && existingUserByUsername.id !== id) {
+          throw new BadRequestException('Username is already taken');
+        }
+      }
+
+      if (email) {
+        const existingUserByEmail = await this.prisma.user.findUnique({
+          where: { email },
+        });
+        if (existingUserByEmail && existingUserByEmail.id !== id) {
+          throw new BadRequestException('Email is already registered');
+        }
+      }
+
+      return await this.prisma.user.update({
+        where: { id },
+        data: updateUserDto,
+      });
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to update user');
+    }
+  }
 }

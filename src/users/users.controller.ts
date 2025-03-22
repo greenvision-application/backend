@@ -106,6 +106,35 @@ export class UsersController {
     return this.usersService.createUser(createUserDto);
   }
 
+  @Patch('update-client')
+  @ApiOperation({ summary: 'Update client information' })
+  @ApiOkResponse({
+    description: 'User updated successfully',
+    type: UserEntity,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async updateClient(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
+    try {
+      return await this.usersService.updateClientInformation(
+        req.user?.id,
+        updateUserDto,
+      );
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Update user by id' })
   @ApiOkResponse({
