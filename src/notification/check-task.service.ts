@@ -38,7 +38,7 @@ export class TaskNotificationService {
           completion_status: TASK_STATUS.DO,
           task_date: {
             gte: now,
-            lte: new Date(now.getTime() + 2 * 60 * 60 * 1000), // Task trong 2 giờ tới
+            lte: new Date(now.getTime() + 4 * 60 * 60 * 1000), // Task trong 4 giờ tới
           },
         },
         include: {
