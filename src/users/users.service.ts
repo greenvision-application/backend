@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   InternalServerErrorException,
+  ConflictException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -225,7 +226,7 @@ export class UsersService {
           where: { username },
         });
         if (existingUserByUsername && existingUserByUsername.id !== id) {
-          throw new BadRequestException('Username is already taken');
+          throw new ConflictException('Username is already taken');
         }
       }
 
@@ -234,7 +235,7 @@ export class UsersService {
           where: { email },
         });
         if (existingUserByEmail && existingUserByEmail.id !== id) {
-          throw new BadRequestException('Email is already registered');
+          throw new ConflictException('Email is already registered');
         }
       }
 
@@ -245,7 +246,7 @@ export class UsersService {
     } catch (error) {
       if (
         error instanceof NotFoundException ||
-        error instanceof BadRequestException
+        error instanceof ConflictException
       ) {
         throw error;
       }
