@@ -47,6 +47,7 @@ export class NotificationService {
                 select: {
                   Plant: {
                     select: {
+                      id: true,
                       image_url: true,
                     },
                   },
