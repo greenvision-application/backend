@@ -45,6 +45,7 @@ export class NotificationService {
             select: {
               User_Plant: {
                 select: {
+                  id: true,
                   Plant: {
                     select: {
                       id: true,
