@@ -4,6 +4,7 @@ import {
   ConflictException,
   UnauthorizedException,
   InternalServerErrorException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -75,6 +76,9 @@ export class AuthService {
       if (!user || !(await bcrypt.compare(password, user.password))) {
         throw new UnauthorizedException('Invalid credentials');
       }
+      if (!user.is_active) {
+        throw new ForbiddenException('User account is inactive');
+      }
 
       const payload = {
         id: user.id,
@@ -86,7 +90,8 @@ export class AuthService {
     } catch (error) {
       if (
         error instanceof BadRequestException ||
-        error instanceof UnauthorizedException
+        error instanceof UnauthorizedException ||
+        error instanceof ForbiddenException
       ) {
         throw error;
       }
