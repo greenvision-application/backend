@@ -19,6 +19,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiOkResponse,
+  ApiParam,
 } from '@nestjs/swagger';
 import { TaskEntity } from './entities/task.entity';
 
@@ -120,5 +121,16 @@ export class TasksController {
       }
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @ApiOperation({ summary: 'Generate task base on care schedule' })
+  @ApiParam({ name: 'id', description: 'Care schedule plant ID (UUID)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return AI generated plant care schedule',
+  })
+  @Post(':id')
+  generateTaskForSchedule(@Param('id', ParseUUIDPipe) id: string) {
+    return this.tasksService.getTaskForClient(id);
   }
 }

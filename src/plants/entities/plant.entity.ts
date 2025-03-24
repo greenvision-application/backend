@@ -64,4 +64,7 @@ export class PlantEntity implements Plant {
 
   @ApiProperty()
   lightRequirement: LEVEL;
+
+  @ApiProperty()
+  approved_content: boolean;
 }

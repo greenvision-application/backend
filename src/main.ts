@@ -16,6 +16,14 @@ async function bootstrap() {
     .setTitle('GreenVision')
     .setDescription('The GreenVision API description')
     .setVersion('0.1')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
     .build();
 
   app.useGlobalPipes(new ValidationPipe());
@@ -24,8 +32,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT ?? 8080);
-  console.log(
-    `Application is running on: (http://localhost:${process.env.PORT})`,
-  );
+  const appUrl = await app.getUrl();
+  console.log(`Application is running on: ${appUrl}`);
 }
 bootstrap();

@@ -11,6 +11,8 @@ import {
   NotFoundException,
   BadRequestException,
   Patch,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -18,11 +20,13 @@ import {
   ApiOperation,
   ApiCreatedResponse,
   ApiResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity/user.entity';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 
 @Controller('users')
 @ApiTags('Users')
@@ -44,7 +48,7 @@ export class UsersController {
     }
   }
 
-  @Get(':id')
+  @Get('detail')
   @ApiOperation({ summary: 'Get user by id' })
   @ApiOkResponse({
     description: 'User retrieved successfully',
@@ -54,9 +58,11 @@ export class UsersController {
     status: HttpStatus.NOT_FOUND,
     description: 'User not found',
   })
-  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async findOne(@Req() req: any) {
     try {
-      return await this.usersService.findOne(id);
+      return await this.usersService.findOne(req.user?.id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -100,6 +106,35 @@ export class UsersController {
     return this.usersService.createUser(createUserDto);
   }
 
+  @Patch('update-client')
+  @ApiOperation({ summary: 'Update client information' })
+  @ApiOkResponse({
+    description: 'User updated successfully',
+    type: UserEntity,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async updateClient(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
+    try {
+      return await this.usersService.updateClientInformation(
+        req.user?.id,
+        updateUserDto,
+      );
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Update user by id' })
   @ApiOkResponse({
@@ -120,6 +155,38 @@ export class UsersController {
   ) {
     try {
       return await this.usersService.updateUser(id, updateUserDto);
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Patch('update-push-token')
+  @ApiOperation({ summary: 'Update PushToken by id' })
+  @ApiOkResponse({
+    description: 'User updated successfully',
+    type: UserEntity,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async updatePushToken(
+    @Req() req: any,
+    @Body('updatePushToken') updatePushToken: string,
+  ) {
+    try {
+      return await this.usersService.updatePushToken(
+        req.user?.id,
+        updatePushToken,
+      );
     } catch (error) {
       if (
         error instanceof NotFoundException ||

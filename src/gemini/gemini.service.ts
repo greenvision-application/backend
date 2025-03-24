@@ -10,16 +10,29 @@ import { ConfigService } from '@nestjs/config';
 import { v4 } from 'uuid';
 import { createApi } from 'unsplash-js';
 import { GetAIMessageDTO } from './dto/get-ai-response.dto';
-import { GetAIScanResultDTO } from './dto/get-scan-result.dto';
+import {
+  GetAIScanResultDTO,
+  PlantHealthReportDto,
+} from './dto/get-scan-result.dto';
 import gemini from 'constants/gemini';
 import keys from 'constants/keys';
-import systemPrompt from 'constants/prompts/to-scan';
+import promptToScan from 'constants/prompts/to-scan';
+import promptToGeneratePhasePlant from 'constants/prompts/to-generate-phases';
+import promptToGenerateSchedule from 'constants/prompts/to-generate-schedule';
+import promptToGenerateTask from 'constants/prompts/to-generate-task';
 import { PlantResponseDTO } from './dto/ai-scan-plant-response.dto';
+import { PlantGrowthPhaseDTO } from './dto/plant-growth-phase.dto';
+import { CareScheduleDto, CareTaskDto } from './dto/care-schedule.dto';
 
 @Injectable()
 export class GeminiService {
   private readonly googleAI: GoogleGenerativeAI;
-  private readonly model: GenerativeModel;
+  private readonly modelGeneral: GenerativeModel;
+  private readonly modelImageAnalysis: GenerativeModel;
+  private readonly modelPhaseGeneration: GenerativeModel;
+  private readonly modelScheduleGeneration: GenerativeModel;
+  private readonly modelTaskGeneration: GenerativeModel;
+  private readonly modelHealthGeneration: GenerativeModel;
   private readonly fileManager: GoogleAIFileManager;
   private chatSessions: { [sessionId: string]: ChatSession } = {};
   private readonly logger = new Logger(GeminiService.name);
@@ -30,9 +43,29 @@ export class GeminiService {
     const unsplashAccessKey = configService.get(keys.unsplashAccessKey);
     this.googleAI = new GoogleGenerativeAI(geminiApiKey);
     this.fileManager = new GoogleAIFileManager(geminiApiKey);
-    this.model = this.googleAI.getGenerativeModel({
-      model: gemini.GEMINI_MODEL_NAME,
-      generationConfig: gemini.generationConfig,
+    this.modelGeneral = this.googleAI.getGenerativeModel({
+      model: gemini.GEMINI_MODEL_NAME_V1,
+      generationConfig: gemini.generalConfig,
+    });
+    this.modelImageAnalysis = this.googleAI.getGenerativeModel({
+      model: gemini.GEMINI_MODEL_NAME_V1,
+      generationConfig: gemini.imageAnalysisConfig,
+    });
+    this.modelPhaseGeneration = this.googleAI.getGenerativeModel({
+      model: gemini.GEMINI_MODEL_NAME_V2,
+      generationConfig: gemini.phaseGenerationConfig,
+    });
+    this.modelScheduleGeneration = this.googleAI.getGenerativeModel({
+      model: gemini.GEMINI_MODEL_NAME_V2,
+      generationConfig: gemini.scheduleGenerationConfig,
+    });
+    this.modelTaskGeneration = this.googleAI.getGenerativeModel({
+      model: gemini.GEMINI_MODEL_NAME_V3,
+      generationConfig: gemini.taskGenerationConfig,
+    });
+    this.modelHealthGeneration = this.googleAI.getGenerativeModel({
+      model: gemini.GEMINI_MODEL_NAME_V1,
+      generationConfig: gemini.checkHealthGenerationConfig,
     });
     this.unsplash = createApi({ accessKey: unsplashAccessKey });
   }
@@ -42,7 +75,7 @@ export class GeminiService {
     let result = this.chatSessions[sessionIdToUse];
 
     if (!result) {
-      result = this.model.startChat();
+      result = this.modelGeneral.startChat();
     }
 
     return {
@@ -86,7 +119,7 @@ export class GeminiService {
       const result = await chat.sendMessage(data.prompt.toString());
 
       return {
-        result: await result.response.text(),
+        result: result.response.text(),
         sessionId,
       };
     } catch (error) {
@@ -94,14 +127,14 @@ export class GeminiService {
     }
   }
 
-  private async processAIResponse(
+  private async processAIResponse<T>(
     result: GenerateContentResult,
-  ): Promise<PlantResponseDTO> {
+  ): Promise<T> {
     const rawText = result.response?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!rawText) {
       throw new Error('No valid response from Gemini AI model');
     }
-    return JSON.parse(rawText);
+    return JSON.parse(rawText) as T;
   }
 
   async analyzeImageUrl(data: GetAIScanResultDTO): Promise<PlantResponseDTO> {
@@ -123,17 +156,18 @@ export class GeminiService {
         );
       }
 
-      const result = await this.model.generateContent([
+      const result = await this.modelImageAnalysis.generateContent([
         {
           inlineData: {
             data: Buffer.from(imageBuffer).toString('base64'),
             mimeType: contentType,
           },
         },
-        systemPrompt.promptToScanEn,
+        promptToScan.promptToScanEn,
       ]);
 
-      const processedResult = await this.processAIResponse(result);
+      const processedResult =
+        await this.processAIResponse<PlantResponseDTO>(result);
 
       const { scientific_name, plant_name, searchQuery } = processedResult;
       const searchQueryKey = searchQuery || scientific_name || plant_name;
@@ -150,17 +184,18 @@ export class GeminiService {
     mimeType: string,
   ): Promise<PlantResponseDTO> {
     try {
-      const result = await this.model.generateContent([
+      const result = await this.modelImageAnalysis.generateContent([
         {
           fileData: {
             fileUri,
             mimeType: mimeType,
           },
         },
-        systemPrompt.promptToScanEn,
+        promptToScan.promptToScanEn,
       ]);
 
-      const processedResult = await this.processAIResponse(result);
+      const processedResult =
+        await this.processAIResponse<PlantResponseDTO>(result);
 
       const { scientific_name, plant_name, searchQuery } = processedResult;
       const searchQueryKey = searchQuery || scientific_name || plant_name;
@@ -170,6 +205,86 @@ export class GeminiService {
     } catch (error) {
       this.logger.error('Error analyzing uploaded image:', error);
       throw new Error('Failed to analyze image');
+    }
+  }
+
+  async generatePhaseOfPlant(
+    plant_name: string,
+    scientificName: string,
+  ): Promise<PlantGrowthPhaseDTO[]> {
+    try {
+      const handlePrompt = promptToGeneratePhasePlant.promptToGeneratePhaseEn(
+        plant_name,
+        scientificName,
+      );
+      const geminiResult =
+        await this.modelPhaseGeneration.generateContent(handlePrompt);
+      const processAIResponse =
+        await this.processAIResponse<PlantGrowthPhaseDTO[]>(geminiResult);
+      return processAIResponse;
+    } catch (error) {
+      this.logger.error('Error generate phases for plant :', error);
+    }
+  }
+
+  async generateScheduleTakeCarePlant(
+    getUserPlantData: any,
+  ): Promise<CareScheduleDto[]> {
+    try {
+      const handlePrompt =
+        promptToGenerateSchedule.promptToGenerateCareScheduleEn(
+          getUserPlantData,
+        );
+      const geminiResult =
+        await this.modelScheduleGeneration.generateContent(handlePrompt);
+      const processAIResponse =
+        await this.processAIResponse<CareScheduleDto[]>(geminiResult);
+      return processAIResponse;
+    } catch (error) {
+      this.logger.error('Error generate schedule for plant :', error);
+    }
+  }
+
+  async generateTaskTakeCarePlant(
+    getCareSchedulePlant: any,
+  ): Promise<CareTaskDto[]> {
+    try {
+      const handlePrompt =
+        promptToGenerateTask.promptToGeneratePersonalizedTasksVi(
+          getCareSchedulePlant,
+        );
+      const geminiResult =
+        await this.modelTaskGeneration.generateContent(handlePrompt);
+      const processAIResponse =
+        await this.processAIResponse<CareTaskDto[]>(geminiResult);
+      return processAIResponse;
+    } catch (error) {
+      this.logger.error('Error generate Task for take care plant :', error);
+    }
+  }
+
+  async generateCheckPlantHealth(
+    fileUri: string,
+    mimeType: string,
+  ): Promise<PlantHealthReportDto> {
+    try {
+      const result = await this.modelHealthGeneration.generateContent([
+        {
+          fileData: {
+            fileUri,
+            mimeType: mimeType,
+          },
+        },
+        promptToScan.promptToScanHealthEn,
+      ]);
+
+      const processedResult =
+        await this.processAIResponse<PlantHealthReportDto>(result);
+
+      return processedResult;
+    } catch (error) {
+      this.logger.error('Error analyzing health uploaded image:', error);
+      throw new Error('Failed to analyze plant health image');
     }
   }
 }

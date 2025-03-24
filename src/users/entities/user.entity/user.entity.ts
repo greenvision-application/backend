@@ -11,17 +11,19 @@ export class UserEntity implements User {
   @ApiProperty()
   username: string;
 
-  @ApiProperty({ nullable: true })
-  email: string;
+  @ApiProperty()
+  password: string;
 
   @ApiProperty({ nullable: true })
-  phone_number: string;
+  email: string;
 
   @ApiProperty({ format: 'uuid' })
   role_id: string;
 
-  @ApiProperty({ format: 'uuid', nullable: true })
-  ward_id: string;
+  @ApiProperty({ nullable: true })
+  address: any;
+  @ApiProperty({ nullable: true })
+  pushToken: string;
 
   @ApiProperty({ nullable: true })
   preferences: any;

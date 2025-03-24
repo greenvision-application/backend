@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsEnum,
   IsUUID,
+  IsBoolean,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import {
@@ -100,8 +101,8 @@ export class CreatePlantDto
 
   @ApiProperty()
   @IsUUID()
-  @IsNotEmpty()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @IsOptional()
   category_id: string;
 
   @ApiProperty({ default: PLANT_SITE.OUTDOOR })
@@ -141,4 +142,9 @@ export class CreatePlantDto
   @IsNotEmpty()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   lightRequirement: LEVEL;
+
+  @ApiProperty({ default: false })
+  @IsNotEmpty()
+  @IsBoolean()
+  approved_content: boolean;
 }

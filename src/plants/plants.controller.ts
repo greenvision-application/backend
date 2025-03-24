@@ -10,23 +10,32 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { PlantsService } from './plants.service';
 import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
 import { PlantEntity } from './entities/plant.entity';
 import { UrlImagePlantDto } from './dto/url-image-plant.dto';
+import { GeneratePhaseDto } from './dto/generate-phase.dto';
+import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
+import { PlantRecommendationService } from './plant-recommendation.service';
 
 @Controller('plants')
 @ApiTags('Plants')
 export class PlantsController {
-  constructor(private readonly plantsService: PlantsService) {}
+  constructor(
+    private readonly plantsService: PlantsService,
+    private readonly plantRecommendation: PlantRecommendationService,
+  ) {}
 
   @Post()
   create(@Body() createPlantDto: CreatePlantDto) {
@@ -63,6 +72,23 @@ export class PlantsController {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @Get('client-plants')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  async getAllPlants(@Req() req: any) {
+    return this.plantsService.findAllForClient(req.user?.id);
+  }
+
+  @Get('recommendations')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get 6 recommendations' })
+  async getRecommendedPlants(@Req() req: any) {
+    const recommendations =
+      await this.plantRecommendation.recommendSimilarPlants(req.user?.id);
+    return recommendations;
   }
 
   @Get(':id')
@@ -130,6 +156,30 @@ export class PlantsController {
       if (error instanceof NotFoundException) {
         throw error;
       }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('generate-phase/:id')
+  @ApiOperation({ summary: 'Generate phase of plant' })
+  @ApiOkResponse({
+    description: 'Phase of plant generated successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Failed to generate phase of plant',
+  })
+  async generatePhase(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() generatePhaseDto: GeneratePhaseDto,
+  ) {
+    try {
+      return await this.plantsService.createPlantPhaseWithAI(
+        generatePhaseDto.plant_name,
+        generatePhaseDto.scientific_name,
+        id,
+      );
+    } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
