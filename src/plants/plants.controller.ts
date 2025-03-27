@@ -12,6 +12,8 @@ import {
   NotFoundException,
   UseGuards,
   Req,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -19,15 +21,19 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
 import { PlantsService } from './plants.service';
 import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
 import { PlantEntity } from './entities/plant.entity';
-import { UrlImagePlantDto } from './dto/url-image-plant.dto';
+// import { UrlImagePlantDto } from './dto/url-image-plant.dto';
 import { GeneratePhaseDto } from './dto/generate-phase.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 import { PlantRecommendationService } from './plant-recommendation.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUploadService } from '@/file-upload/file-upload.service';
 
 @Controller('plants')
 @ApiTags('Plants')
@@ -35,6 +41,7 @@ export class PlantsController {
   constructor(
     private readonly plantsService: PlantsService,
     private readonly plantRecommendation: PlantRecommendationService,
+    private readonly uploadFileService: FileUploadService,
   ) {}
 
   @Post()
@@ -42,7 +49,6 @@ export class PlantsController {
     return this.plantsService.create(createPlantDto);
   }
 
-  @Post('scan')
   @ApiOperation({ summary: 'Scan plant from image URL' })
   @ApiOkResponse({
     description: 'Plant identification result',
@@ -52,9 +58,31 @@ export class PlantsController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to scan plant',
   })
-  async scanPlant(@Body() urlImagePlantDto: UrlImagePlantDto) {
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Image file to upload',
+    type: 'multipart/form-data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @Post('scan')
+  @UseInterceptors(FileInterceptor('file'))
+  async scanPlant(@UploadedFile() file: Express.Multer.File) {
     try {
-      return await this.plantsService.scanPlant(urlImagePlantDto.imageUrl);
+      const uploadResult =
+        await this.uploadFileService.handleFileUploadToGoogle(file);
+      return await this.plantsService.scanPlant(
+        uploadResult.fileUri,
+        uploadResult.mimeType,
+      );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }

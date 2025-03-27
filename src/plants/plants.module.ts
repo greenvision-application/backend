@@ -7,6 +7,9 @@ import { GeminiService } from '@/gemini/gemini.service';
 import { PhaseService } from '@/phase/phase.service';
 import { CareInstructionService } from '@/care_instruction/care_instruction.service';
 import { PlantRecommendationService } from './plant-recommendation.service';
+import { FileUploadModule } from '@/file-upload/file-upload.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @Module({
   controllers: [PlantsController],
@@ -17,6 +20,19 @@ import { PlantRecommendationService } from './plant-recommendation.service';
     CareInstructionService,
     PlantRecommendationService,
   ],
-  imports: [PrismaModule, GeminiModule],
+  imports: [
+    PrismaModule,
+    GeminiModule,
+    FileUploadModule,
+    MulterModule.register({
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const filename = `${Date.now()}-${file.originalname}`;
+          cb(null, filename);
+        },
+      }),
+    }),
+  ],
 })
 export class PlantsModule {}

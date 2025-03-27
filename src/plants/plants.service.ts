@@ -190,12 +190,12 @@ export class PlantsService {
     }
   }
 
-  async scanPlant(plantImageUrl: string) {
+  async scanPlant(fileUri: string, mimeType: string) {
     try {
-      const identifyPlant = await this.geminiService.analyzeImageUrl({
-        imageUrl: plantImageUrl,
-        sessionId: null,
-      });
+      const identifyPlant = await this.geminiService.analyzeUploadedFile(
+        fileUri,
+        mimeType,
+      );
       const { scientific_name, plant_name } = identifyPlant;
 
       const existingPlant = await this.prisma.plant.findFirst({
