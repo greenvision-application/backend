@@ -117,6 +117,7 @@ export class PlantsService {
           approved_content: true,
           Category: {
             select: {
+              id: true,
               category_name: true,
             },
           },
