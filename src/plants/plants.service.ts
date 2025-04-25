@@ -191,7 +191,7 @@ export class PlantsService {
     }
   }
 
-  async scanPlant(fileUri: string, mimeType: string) {
+  async scanFilePlant(fileUri: string, mimeType: string) {
     try {
       const identifyPlant = await this.geminiService.analyzeUploadedFile(
         fileUri,
@@ -218,6 +218,25 @@ export class PlantsService {
       //   },
       // });
       // return newPlant;
+    } catch (error) {
+      throw new Error(`Failed to scan plant: ${error.message}`);
+    }
+  }
+  async scanUrlPlant(imageUrl: string) {
+    try {
+      const identifyPlant = await this.geminiService.analyzeImageUrl(imageUrl);
+      const { scientific_name, plant_name } = identifyPlant;
+
+      const existingPlant = await this.prisma.plant.findFirst({
+        where: {
+          OR: [{ scientific_name }, { plant_name }],
+        },
+      });
+      if (existingPlant) {
+        return existingPlant;
+      }
+
+      return identifyPlant;
     } catch (error) {
       throw new Error(`Failed to scan plant: ${error.message}`);
     }

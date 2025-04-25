@@ -28,7 +28,7 @@ import { PlantsService } from './plants.service';
 import { CreatePlantDto } from './dto/create-plant.dto';
 import { UpdatePlantDto } from './dto/update-plant.dto';
 import { PlantEntity } from './entities/plant.entity';
-// import { UrlImagePlantDto } from './dto/url-image-plant.dto';
+import { UrlImagePlantDto } from './dto/url-image-plant.dto';
 import { GeneratePhaseDto } from './dto/generate-phase.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 import { PlantRecommendationService } from './plant-recommendation.service';
@@ -49,7 +49,7 @@ export class PlantsController {
     return this.plantsService.create(createPlantDto);
   }
 
-  @ApiOperation({ summary: 'Scan plant from image URL' })
+  @ApiOperation({ summary: 'Scan plant from image file' })
   @ApiOkResponse({
     description: 'Plant identification result',
     type: PlantEntity,
@@ -79,10 +79,28 @@ export class PlantsController {
     try {
       const uploadResult =
         await this.uploadFileService.handleFileUploadToGoogle(file);
-      return await this.plantsService.scanPlant(
+      return await this.plantsService.scanFilePlant(
         uploadResult.fileUri,
         uploadResult.mimeType,
       );
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @ApiOperation({ summary: 'Scan plant from image URL' })
+  @ApiOkResponse({
+    description: 'Plant identification result',
+    type: PlantEntity,
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Failed to scan plant',
+  })
+  @Post('scan/url')
+  async scanUrlPlant(@Body() data: UrlImagePlantDto) {
+    try {
+      return await this.plantsService.scanUrlPlant(data.imageUrl);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }

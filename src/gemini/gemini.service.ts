@@ -10,10 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { v4 } from 'uuid';
 import { createApi } from 'unsplash-js';
 import { GetAIMessageDTO } from './dto/get-ai-response.dto';
-import {
-  GetAIScanResultDTO,
-  PlantHealthReportDto,
-} from './dto/get-scan-result.dto';
+import { PlantHealthReportDto } from './dto/get-scan-result.dto';
 import gemini from 'constants/gemini';
 import keys from 'constants/keys';
 import promptToScan from 'constants/prompts/to-scan';
@@ -137,13 +134,13 @@ export class GeminiService {
     return JSON.parse(rawText) as T;
   }
 
-  async analyzeImageUrl(data: GetAIScanResultDTO): Promise<PlantResponseDTO> {
+  async analyzeImageUrl(imageUrl: string): Promise<PlantResponseDTO> {
     try {
-      if (!data.imageUrl) {
+      if (!imageUrl) {
         throw new Error('Image URL is required');
       }
 
-      const imageResp = await fetch(data.imageUrl);
+      const imageResp = await fetch(imageUrl);
       if (!imageResp.ok) {
         throw new Error('Failed to fetch image');
       }

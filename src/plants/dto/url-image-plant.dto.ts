@@ -23,5 +23,5 @@ export class UrlImagePlantDto {
   @IsUrl()
   @Transform(({ value }) => value?.trim())
   @IsOptional()
-  imageUrlExample: string;
+  imageUrlExample?: string;
 }
