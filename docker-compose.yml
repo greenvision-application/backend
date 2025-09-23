@@ -1,0 +1,51 @@
+services:
+  backend:
+    build:
+      dockerfile: docker/Dockerfile.product
+      context: .
+    container_name: ${APP_NAME}-app
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${PORT}:${PORT}
+    command: sh -c "yarn db:migrate && yarn start:dev"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17-alpine
+    container_name: ${APP_NAME}-db
+    environment:
+      POSTGRES_DB: ${DB_POSTGRES_DATABASE}
+      POSTGRES_USER: ${DB_POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${DB_POSTGRES_PASSWORD}
+      DB_PORT: ${DB_POSTGRES_PORT}
+      DB_HOST: ${DB_POSTGRES_HOST}
+    ports:
+      - ${DB_POSTGRES_PORT}:${DB_POSTGRES_PORT}
+    volumes:
+      - gv-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  studio:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.local
+    container_name: ${APP_NAME}-studio
+    env_file:
+      - .env
+    ports:
+      - 5555:5555
+    command: yarn db:studio
+    depends_on:
+      - db
+    volumes:
+      - ./:/app
+      - /app/node_modules
+
+volumes:
+  gv-data:
