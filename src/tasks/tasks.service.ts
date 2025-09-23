@@ -131,11 +131,13 @@ export class TasksService {
         );
       }
 
-      const careScheduleData =
-        await this.careSchedule.getScheduleInforToPrompt(care_schedule_id);
+      const careScheduleData = await this.careSchedule.getScheduleInforToPrompt(
+        care_schedule_id,
+      );
 
-      const taskGenerate =
-        await this.geminiService.generateTaskTakeCarePlant(careScheduleData);
+      const taskGenerate = await this.geminiService.generateTaskTakeCarePlant(
+        careScheduleData,
+      );
 
       await this.prisma.task.createMany({
         data: taskGenerate.map((task) => ({

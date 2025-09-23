@@ -163,8 +163,9 @@ export class GeminiService {
         promptToScan.promptToScanEn,
       ]);
 
-      const processedResult =
-        await this.processAIResponse<PlantResponseDTO>(result);
+      const processedResult = await this.processAIResponse<PlantResponseDTO>(
+        result,
+      );
 
       const { scientific_name, plant_name, searchQuery } = processedResult;
       const searchQueryKey = searchQuery || scientific_name || plant_name;
@@ -191,8 +192,9 @@ export class GeminiService {
         promptToScan.promptToScanEn,
       ]);
 
-      const processedResult =
-        await this.processAIResponse<PlantResponseDTO>(result);
+      const processedResult = await this.processAIResponse<PlantResponseDTO>(
+        result,
+      );
 
       const { scientific_name, plant_name, searchQuery } = processedResult;
       const searchQueryKey = searchQuery || scientific_name || plant_name;
@@ -214,10 +216,12 @@ export class GeminiService {
         plant_name,
         scientificName,
       );
-      const geminiResult =
-        await this.modelPhaseGeneration.generateContent(handlePrompt);
-      const processAIResponse =
-        await this.processAIResponse<PlantGrowthPhaseDTO[]>(geminiResult);
+      const geminiResult = await this.modelPhaseGeneration.generateContent(
+        handlePrompt,
+      );
+      const processAIResponse = await this.processAIResponse<
+        PlantGrowthPhaseDTO[]
+      >(geminiResult);
       return processAIResponse;
     } catch (error) {
       this.logger.error('Error generate phases for plant :', error);
@@ -232,10 +236,12 @@ export class GeminiService {
         promptToGenerateSchedule.promptToGenerateCareScheduleEn(
           getUserPlantData,
         );
-      const geminiResult =
-        await this.modelScheduleGeneration.generateContent(handlePrompt);
-      const processAIResponse =
-        await this.processAIResponse<CareScheduleDto[]>(geminiResult);
+      const geminiResult = await this.modelScheduleGeneration.generateContent(
+        handlePrompt,
+      );
+      const processAIResponse = await this.processAIResponse<CareScheduleDto[]>(
+        geminiResult,
+      );
       return processAIResponse;
     } catch (error) {
       this.logger.error('Error generate schedule for plant :', error);
@@ -250,10 +256,12 @@ export class GeminiService {
         promptToGenerateTask.promptToGeneratePersonalizedTasksVi(
           getCareSchedulePlant,
         );
-      const geminiResult =
-        await this.modelTaskGeneration.generateContent(handlePrompt);
-      const processAIResponse =
-        await this.processAIResponse<CareTaskDto[]>(geminiResult);
+      const geminiResult = await this.modelTaskGeneration.generateContent(
+        handlePrompt,
+      );
+      const processAIResponse = await this.processAIResponse<CareTaskDto[]>(
+        geminiResult,
+      );
       return processAIResponse;
     } catch (error) {
       this.logger.error('Error generate Task for take care plant :', error);

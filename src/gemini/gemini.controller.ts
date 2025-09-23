@@ -59,8 +59,9 @@ export class GeminiController {
   @Post('upload-image')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    const uploadResult =
-      await this.uploadFileService.handleFileUploadToGoogle(file);
+    const uploadResult = await this.uploadFileService.handleFileUploadToGoogle(
+      file,
+    );
     return this.geminiService.analyzeUploadedFile(
       uploadResult.fileUri,
       uploadResult.mimeType,
@@ -87,8 +88,9 @@ export class GeminiController {
   @Post('check-health')
   @UseInterceptors(FileInterceptor('file'))
   async checkPlantHealth(@UploadedFile() file: Express.Multer.File) {
-    const uploadResult =
-      await this.uploadFileService.handleFileUploadToGoogle(file);
+    const uploadResult = await this.uploadFileService.handleFileUploadToGoogle(
+      file,
+    );
     return this.geminiService.generateCheckPlantHealth(
       uploadResult.fileUri,
       uploadResult.mimeType,

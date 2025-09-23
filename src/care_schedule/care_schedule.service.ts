@@ -193,8 +193,9 @@ export class CareScheduleService {
           user_plant_id,
         );
 
-      const schedules =
-        await this.geminiService.generateScheduleTakeCarePlant(plantData);
+      const schedules = await this.geminiService.generateScheduleTakeCarePlant(
+        plantData,
+      );
 
       const createdCareSchedules = [];
 

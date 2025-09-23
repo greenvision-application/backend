@@ -12,7 +12,8 @@ import {
 } from 'class-validator';
 
 export class CreateUserPlantDto
-  implements Omit<Prisma.User_PlantCreateInput, 'id' | 'created_at' | 'user_id'>
+  implements
+    Omit<Prisma.User_PlantCreateInput, 'id' | 'created_at' | 'user_id'>
 {
   @ApiProperty({ required: false, example: 'My Lovely Plant' })
   @IsString()

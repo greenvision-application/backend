@@ -117,7 +117,9 @@ export class TaskNotificationService {
       const plantName = plant?.nickname || plant?.Plant?.plant_name || 'cây';
       const phaseName = task.Care_Schedule?.phase_name || '';
 
-      const title = `Nhiệm vụ chăm sóc ${plantName}${phaseName ? ` - ${phaseName}` : ''}`;
+      const title = `Nhiệm vụ chăm sóc ${plantName}${
+        phaseName ? ` - ${phaseName}` : ''
+      }`;
       const message = task.content;
 
       // Gửi thông báo và lưu vào DB
