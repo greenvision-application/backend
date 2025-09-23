@@ -164,6 +164,7 @@ const plantGrowthPhasesSchema: ArraySchema = {
                   },
                   unit: {
                     type: SchemaType.STRING,
+                    format: 'enum',
                     description: 'Unit of time (day, week, month).',
                     enum: ['day', 'week', 'month'],
                   },
@@ -177,6 +178,7 @@ const plantGrowthPhasesSchema: ArraySchema = {
               },
               unit: {
                 type: SchemaType.STRING,
+                format: 'enum',
                 description: 'Unit for water measurement (ml, l).',
                 enum: ['ml', 'l'],
               },
@@ -185,11 +187,13 @@ const plantGrowthPhasesSchema: ArraySchema = {
           },
           sunlight: {
             type: SchemaType.STRING,
-            description: 'Sunlight requirement level in this phase.',
+            format: 'enum',
             enum: ['NONE', 'VERY_LOW', 'LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'],
+            description: 'Sunlight requirement level in this phase.',
           },
           moisture: {
             type: SchemaType.STRING,
+            format: 'enum',
             description: 'Moisture level needed in this phase for the plant.',
             enum: ['NONE', 'VERY_LOW', 'LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'],
           },
@@ -226,6 +230,7 @@ const plantGrowthPhasesSchema: ArraySchema = {
                   },
                   unit: {
                     type: SchemaType.STRING,
+                    format: 'enum',
                     description: 'Unit of time (day, week, month).',
                     enum: ['day', 'week', 'month'],
                   },
@@ -249,6 +254,7 @@ const plantGrowthPhasesSchema: ArraySchema = {
                   },
                   unit: {
                     type: SchemaType.STRING,
+                    format: 'enum',
                     description: 'Unit of time (day, week, month).',
                     enum: ['day', 'week', 'month'],
                   },
